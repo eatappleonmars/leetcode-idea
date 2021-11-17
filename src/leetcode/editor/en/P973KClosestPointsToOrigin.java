@@ -54,17 +54,14 @@ public class P973KClosestPointsToOrigin {
 
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
-
-
-
         public int[][] kClosest(int[][] points, int k) {
-//            return solveWithArraySort(points, k);
-            return solveWithHeap(points, k);
+            return solveWithArraySort(points, k);
+//            return solveWithHeap(points, k);
         }
 
         private int[][] solveWithArraySort(int[][] points, int k) {
             final Function<int[], Integer> sqDistanceFunc = (point) -> {
-
+                return point[0] * point[0] + point[1] * point[1];
             };
             Arrays.sort(points, Comparator.comparing(sqDistanceFunc));
             return Arrays.copyOfRange(points, 0, k);
