@@ -75,36 +75,4 @@ public class P523ContinuousSubarraySum {
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
-
-    
-    /**
-     * Test
-     */
-    public static void main(String[] args) {
-        Solution sol = new P523ContinuousSubarraySum().new Solution();
-
-        final int[] nums1 = {23,2,4,6,7};
-        final int k1 = 6;
-        System.out.println(sol.checkSubarraySum(nums1, k1)); // true
-
-        final int[] nums2 = {23,2,6,4,7};
-        final int k2 = 6;
-        System.out.println(sol.checkSubarraySum(nums2, k2)); // true
-
-        final int[] nums3 = {23,2,6,4,7};
-        final int k3 = 13;
-        System.out.println(sol.checkSubarraySum(nums3, k3)); // false
-
-        final int[] nums4 = {23,2,4,6,6};
-        final int k4 = 7;
-        System.out.println(sol.checkSubarraySum(nums4, k4)); // true
-
-        final int[] nums5 = {1,0};
-        final int k5 = 7;
-        System.out.println(sol.checkSubarraySum(nums5, k5)); // false
-
-        final int[] nums6 = {5,0,0,0};
-        final int k6 = 3;
-        System.out.println(sol.checkSubarraySum(nums6, k6)); // true
-    }
 }
