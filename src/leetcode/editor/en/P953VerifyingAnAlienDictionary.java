@@ -52,11 +52,6 @@ package leetcode.editor.en;
 
 // 2021-11-15 17:18:53
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 public class P953VerifyingAnAlienDictionary {
     
     //leetcode submit region begin(Prohibit modification and deletion)
