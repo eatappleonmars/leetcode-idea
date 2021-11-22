@@ -41,10 +41,7 @@ package leetcode.editor.en;
 import utils.TreeNode;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.function.Consumer;
 
 public class P199BinaryTreeRightSideView {
     
@@ -66,38 +63,24 @@ public class P199BinaryTreeRightSideView {
      */
     class Solution {
         public List<Integer> rightSideView(TreeNode root) {
-            return levelTraverseSol(root);
-        }
-
-        // Level traverse the tree. Not the optimal solution.
-        private List<Integer> levelTraverseSol(TreeNode root) {
             List<Integer> result = new ArrayList<>();
             if (root == null) {
                 return result;
             }
-
-            Queue<TreeNode> queue = new LinkedList<>();
-            queue.offer(root);
-
-            Consumer<TreeNode> addToQueue = (treeNode -> {
-                if (treeNode != null) {
-                    queue.offer(treeNode);
-                }
-            });
-
-            while (!queue.isEmpty()) {
-                int levelSize = queue.size();
-                for (int i = 0; i < levelSize; i++) {
-                    TreeNode node = queue.poll();
-                    if (i == 0) {
-                        result.add(node.val);
-                    }
-                    addToQueue.accept(node.right);
-                    addToQueue.accept(node.left);
-                }
-            }
-
+            helper(root, 0, result);
             return result;
+        }
+
+        private void helper(TreeNode root, int depth, List<Integer> result) {
+            if (root == null) {
+                return;
+            }
+            // add first qualified node value;
+            if (depth == result.size()) {
+                result.add(root.val);
+            }
+            helper(root.right, depth + 1, result);
+            helper(root.left, depth + 1, result);
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)
