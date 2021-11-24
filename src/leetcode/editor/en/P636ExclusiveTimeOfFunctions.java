@@ -115,69 +115,48 @@ package leetcode.editor.en;
 // 2021-11-22 22:12:45
 
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class P636ExclusiveTimeOfFunctions {
     
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
-
         public int[] exclusiveTime(int n, List<String> logs) {
 
+            int[] result = new int[n];
+            LinkedList<Integer> stack = new LinkedList<>();
 
-            Set<Integer> seenFuncCallId = new HashSet<>();
-            LinkedList<Log> stack = new LinkedList<>();
-
-            int[] result = new int[logs.size() / 2];
-            int latestStartTime = 0;
-
+            int prevEndTimeStamp = -1;
             for (String logString : logs) {
-                Log newFuncCall = parseToLog(logString);
-                seenFuncCallId.add(newFuncCall.id);
-
+                // parse log string
+                String[] logData = logString.split(":");
+                int id = Integer.parseInt(logData[0]);
+                char state = logData[1].charAt(0);
+                int timestamp = Integer.parseInt(logData[2]);
+                
+                // push to call stack if empty
                 if (stack.isEmpty()) {
-                    stack.offerFirst(newFuncCall);
+                    stack.offerFirst(id);
                     continue;
                 }
+                
+                // first one in stack is the running function call
+                int runningId = stack.peekFirst();
 
-                Log runningFuncCall = stack.peekFirst();
                 int incr = 0;
-                if (newFuncCall.operation == 'e') {
-                    incr = newFuncCall.timestamp - latestStartTime + 1;
+                if (state == 'e') {
+                    incr = timestamp - prevEndTimeStamp;
                     stack.pollFirst(); // remove from stack
-                    latestStartTime = newFuncCall.timestamp + 1;
+                    prevEndTimeStamp = timestamp;
                 } else {
-                    incr = newFuncCall.timestamp - latestStartTime;
-                    stack.offerFirst(newFuncCall); // push new func call to stack, current running func call is suspended
-                    latestStartTime = newFuncCall.timestamp;
+                    incr = timestamp - prevEndTimeStamp - 1;
+                    stack.offerFirst(id); // push new func call to stack, current running func call is suspended
+                    prevEndTimeStamp = timestamp - 1;
                 }
-                result[runningFuncCall.id] += incr;
+                result[runningId] += incr;
             }
-            return Arrays.copyOf(result, seenFuncCallId.size());
-        }
-
-        private Log parseToLog(String log) {
-            String[] logData = log.split(":");
-            int id = Integer.parseInt(logData[0]);
-            char operation = logData[1].charAt(0);
-            int timestamp = Integer.parseInt(logData[2]);
-            return new Log(id, operation, timestamp);
-        }
-    }
-
-    class Log {
-        int id;
-        char operation;
-        int timestamp;
-
-        public Log(int id, char operation, int timestamp) {
-            this.id = id;
-            this.operation = operation;
-            this.timestamp = timestamp;
+            return result;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
