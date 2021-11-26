@@ -35,16 +35,44 @@ public class P215KthLargestElementInAnArray {
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int findKthLargest(int[] nums, int k) {
-            Queue<Integer> minHeap = new PriorityQueue<>();
-            for (int n : nums) {
-                if (minHeap.size() < k) {
-                    minHeap.offer(n);
-                } else if (n > minHeap.peek()) {
-                    minHeap.poll();
-                    minHeap.offer(n);
+            quickSort(nums, 0, nums.length - 1, k - 1);
+            return nums[k - 1];
+        }
+
+        private void quickSort(int[] nums, int beg, int end, final int targetIndex) {
+            if (beg >= end || beg > targetIndex || end < targetIndex) {
+                return;
+            }
+
+            // We need a starting point in order to partition the array
+            // "pivot" is the candidate index & value that we begin with
+            // By selecting the last element, it makes the process easier
+            final int pivotValue = nums[end];
+
+            // All values > pivotValue should be put to the left of partitionIndex
+            // All values < pivotValue should be put to the right of partitionIndex
+            // When partition is completed, partitionIndex should point to the pivotValue
+            int partitionIndex = beg;
+            for(int i = beg; i < end; i++) {
+                if (pivotValue < nums[i]) {
+                    swap(nums, partitionIndex, i);
+                    partitionIndex++;
                 }
             }
-            return minHeap.peek();
+            swap(nums, end, partitionIndex);
+
+            if (partitionIndex == targetIndex) {
+                return;
+            }
+
+            quickSort(nums, beg, partitionIndex - 1, targetIndex);
+            quickSort(nums, partitionIndex + 1, end, targetIndex);
+        }
+
+        private void swap(int[] nums, int i, int j) {
+            int n = nums[i];
+            nums[i] = nums[j];
+            nums[j] = n;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
