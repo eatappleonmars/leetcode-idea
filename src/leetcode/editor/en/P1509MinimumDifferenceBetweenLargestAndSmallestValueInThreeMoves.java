@@ -61,7 +61,6 @@ public class P1509MinimumDifferenceBetweenLargestAndSmallestValueInThreeMoves {
             // There are at most 4 combinations to use this quota towards max or min values
             // Index of pairs: <0, -4>, <1, -3>, <2, -2>, <3, -1>
             final int COUNT = 4;
-            final int 
             if (LEN <= 4) {
                 return 0;
             }
