@@ -69,34 +69,19 @@ public class P735AsteroidCollision {
         public int[] asteroidCollision(int[] asteroids) {
             int top = 0; // mimic top of stack
             for (int i = 1; i < asteroids.length; i++) {
-                top = handle(asteroids, top, asteroids[i]);
+                final int incomingAsteroid = asteroids[i];
+
+                if (top == -1 || incomingAsteroid > 0 || asteroids[top] < 0) {
+                    top++;
+                    asteroids[top] = incomingAsteroid;
+                } else if (asteroids[top] == -incomingAsteroid) {
+                    top--;
+                } else if (asteroids[top] < -incomingAsteroid){
+                    top--;
+                    i--; // keep checking current asteroid
+                }
             }
             return Arrays.copyOf(asteroids, top + 1);
-        }
-
-        private boolean sameDirection(int a1, int a2) {
-            return ((a1 >> 31) ^ (a2 >> 31)) == 0;
-        }
-
-        private int handle(int[] stack, int top, int incomingAsteroid) {
-            // In case of empty stack, or same direction, or will never meet, simply push to stack
-            if (top == -1 || sameDirection(stack[top], incomingAsteroid) || incomingAsteroid > 0) {
-                top++;
-                stack[top] = incomingAsteroid;
-                return top;
-            }
-            // otherwise, if same size, cancel each other
-            if (stack[top] == -incomingAsteroid) {
-                top--;
-                return top;
-            }
-            // compare size, incomingAsteroid must be negative
-            if (-incomingAsteroid < stack[top]) { // incoming asteroid is smaller, bye
-                return top;
-            } else { // incoming asteroid is larger, keep popping the stack and check
-                top--;
-                return handle(stack, top, incomingAsteroid);
-            }
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
