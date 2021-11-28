@@ -90,13 +90,4 @@ public class P359LoggerRateLimiter {
      * boolean param_1 = obj.shouldPrintMessage(timestamp,message);
      */
     //leetcode submit region end(Prohibit modification and deletion)
-
-    
-    /**
-     * Test
-     */
-    public static void main(String[] args) {
-        Solution sol = new P359LoggerRateLimiter().new Solution();
-        
-    } 
 }
