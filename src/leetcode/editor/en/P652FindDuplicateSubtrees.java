@@ -71,28 +71,46 @@ public class P652FindDuplicateSubtrees {
     class Solution {
         public List<TreeNode> findDuplicateSubtrees(TreeNode root) {
             List<TreeNode> res = new ArrayList<>();
-            Map<String, Integer> seen = new HashMap<>();
-            helper(root, seen, res);
+
+            // Idea:
+            // One another solution uses a single Map<String, Integer>
+            // in which the key is concatenation of all values within a sub-tree.
+            // The length of the key grows as we traverse from bottom towards the root of the tree.
+            // Instead, below uses an integer UID to represent a unique tree to reduce the hashing cost.
+            Map<String, Integer> serialToId = new HashMap<>();
+            Map<Integer, Integer> idToCount = new HashMap<>();
+            helper(root, serialToId, idToCount, res);
             return res;
         }
 
-        private String helper(TreeNode root, Map<String, Integer> seen, List<TreeNode> res) {
+        private int helper(TreeNode root, Map<String, Integer> serialToId,
+                           Map<Integer, Integer> idToCount, List<TreeNode> res) {
             if (root == null) {
-                return "*";
+                return 0;
             }
-            String lt = helper(root.left, seen, res);
-            String rt = helper(root.right, seen, res);
+            int lt = helper(root.left, serialToId, idToCount, res);
+            int rt = helper(root.right, serialToId, idToCount, res);
 
             // Must separate with ',' or alike to tell different between 1, 11 and 11, 1
             StringBuilder sb = new StringBuilder();
             String curr = sb.append(root.val).append(",").append(lt).append(",").append(rt).toString();
 
-            int updatedCount = seen.getOrDefault(curr, 0) + 1;
-            seen.put(curr, updatedCount);
+//            int id;
+//            if (!serialToId.containsKey(curr)) {
+//                id = serialToId.size() + 1;
+//                serialToId.put(curr, id);
+//            } else {
+//                id = serialToId.get(curr);
+//            }
+            int id = serialToId.computeIfAbsent(curr, key -> serialToId.size() + 1); // id = 0 has been reserved for null
+
+            int updatedCount = idToCount.getOrDefault(id, 0) + 1;
+            idToCount.put(id, updatedCount);
             if (updatedCount == 2) {
                 res.add(root);
             }
-            return curr;
+
+            return id;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
