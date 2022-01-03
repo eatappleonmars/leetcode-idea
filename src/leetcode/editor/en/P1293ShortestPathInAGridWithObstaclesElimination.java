@@ -81,6 +81,8 @@ public class P1293ShortestPathInAGridWithObstaclesElimination {
             return bfsSolution(grid, k);
         }
 
+        // There are MN grids. Each grid can be visited up to K times.
+        // Time: O(MNK)
         private int bfsSolution(int[][] grid, int k) {
             final int m = grid.length - 1;
             final int n = grid[0].length - 1;

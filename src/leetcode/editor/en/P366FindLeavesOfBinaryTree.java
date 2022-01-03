@@ -64,9 +64,9 @@ public class P366FindLeavesOfBinaryTree {
      */
     class Solution {
         public List<List<Integer>> findLeaves(TreeNode root) {
-            List<List<Integer>> result = new ArrayList<>();
-            dfs(root, result);
-            return result;
+           List<List<Integer>> result = new ArrayList<>();
+           dfs(root, result);
+           return result;
         }
 
         private int dfs(TreeNode root, List<List<Integer>> result) {
@@ -76,17 +76,15 @@ public class P366FindLeavesOfBinaryTree {
             int lt = dfs(root.left, result);
             int rt = dfs(root.right, result);
 
-            // "pos" is the index into which root value is stored in result
+            // "index" is the index into which root value is stored in result
             // also indicates its largest distance to the leaves
-            int pos = Math.max(lt, rt) + 1;
-            if (pos >= result.size()) {
-                List<Integer> newList = new ArrayList<>();
-                newList.add(root.val);
-                result.add(newList);
-            } else {
-                result.get(pos).add(root.val);
+            int index = Math.max(lt, rt) + 1;
+            if (index == result.size()) {
+                result.add(new ArrayList<>());
             }
-            return pos;
+            result.get(index).add(root.val);
+
+            return index;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
