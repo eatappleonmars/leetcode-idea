@@ -10,23 +10,67 @@ class P297SerializeAndDeserializeBinaryTreeTest {
     P297SerializeAndDeserializeBinaryTree.Codec codec = new P297SerializeAndDeserializeBinaryTree().new Codec();
 
     private static final TreeNode ROOT_1 = buildRoot1();
-    private static final String ROOT_1_STR = "1,2,3,*,*,4,5,";
+
+    private static final TreeNode ROOT_2 = null;
+    private static final String SERIALIZED_STR_2 = "";
+
+
 
     @Nested
-    public class SerializationTests {
+    public class PreOrderTests {
+        private static final String PREORDER_SERIALIZED_STR_1 = "1,2,*,*,3,4,*,*,5,*,*";
+
         @Test
-        public void test1() {
-            final String actual = codec.serialize(ROOT_1);
-            assertEquals(ROOT_1_STR, actual);
+        public void test_serialize_1() {
+            final String actual = codec.preOrderSerialize(ROOT_1);
+            assertEquals(PREORDER_SERIALIZED_STR_1, actual);
+        }
+
+        @Test
+        public void test_deserialize_1() {
+            final TreeNode actual = codec.preOrderDeserialize(PREORDER_SERIALIZED_STR_1);
+            assertEquals(ROOT_1, actual);
+        }
+
+        @Test
+        public void test_serialize_2() {
+            final String actual = codec.preOrderSerialize(ROOT_2);
+            assertEquals(SERIALIZED_STR_2, actual);
+        }
+
+        @Test
+        public void test_deserialize_2() {
+            final TreeNode actual = codec.preOrderDeserialize(SERIALIZED_STR_2);
+            assertEquals(ROOT_2, actual);
         }
     }
 
     @Nested
-    public class DeserializationTests {
+    public class BFSTests {
+        private static final String BFS_SERIALIZED_STR_1 = "1,2,3,*,*,4,5,";
+
         @Test
-        public void test1() {
-            final TreeNode actual = codec.deserialize(ROOT_1_STR);
+        public void test_serialize_1() {
+            final String actual = codec.bfsSerialize(ROOT_1);
+            assertEquals(BFS_SERIALIZED_STR_1, actual);
+        }
+
+        @Test
+        public void test_deserialize_1() {
+            final TreeNode actual = codec.bfsDeserialize(BFS_SERIALIZED_STR_1);
             assertEquals(ROOT_1, actual);
+        }
+
+        @Test
+        public void test_serialize_2() {
+            final String actual = codec.bfsSerialize(ROOT_2);
+            assertEquals(SERIALIZED_STR_2, actual);
+        }
+
+        @Test
+        public void test_deserialize_2() {
+            final TreeNode actual = codec.bfsDeserialize(SERIALIZED_STR_2);
+            assertEquals(ROOT_2, actual);
         }
     }
 

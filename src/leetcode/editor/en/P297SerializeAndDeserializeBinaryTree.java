@@ -42,10 +42,12 @@ package leetcode.editor.en;
 
 // 2022-01-04 13:35:45
 
+import com.sun.source.tree.Tree;
 import utils.TreeNode;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class P297SerializeAndDeserializeBinaryTree {
@@ -67,6 +69,61 @@ public class Codec {
 
     // Encodes a tree to a single string.
     public String serialize(TreeNode root) {
+//        return bfsSerialize(root);
+        return preOrderSerialize(root);
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+//        return bfsDeserialize(data);
+        return preOrderDeserialize(data);
+    }
+
+    public String preOrderSerialize(TreeNode root) {
+        if (root == null) {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        preOrderSerialize(root, sb);
+        return sb.toString();
+    }
+
+    private void preOrderSerialize(TreeNode root, StringBuilder sb) {
+        if (root == null) {
+            sb.append(NULL);
+            return;
+        }
+        sb.append(root.val).append(DELIMITER);
+        preOrderSerialize(root.left, sb);
+        sb.append(DELIMITER);
+        preOrderSerialize(root.right, sb);
+    }
+
+    public TreeNode preOrderDeserialize(String data) {
+        if (data == null || data.length() == 0) {
+            return null;
+        }
+        String[] array = data.split(DELIMITER);
+        TreeNode root = new TreeNode(Integer.parseInt(array[0]));
+        int[] index = {0};
+        return preOrderDeserialize(array, index);
+    }
+
+    private TreeNode preOrderDeserialize(String[] data, int[] index) {
+        int i = index[0];
+        if (i >= data.length || data[i].equals(NULL)) {
+            index[0]++;
+            return null;
+        }
+        TreeNode node = new TreeNode(Integer.parseInt(data[i]));
+        index[0]++;
+        node.left = preOrderDeserialize(data, index);
+        node.right = preOrderDeserialize(data, index);
+        return node;
+    }
+
+
+    public String bfsSerialize(TreeNode root) {
         StringBuilder sb = new StringBuilder();
 
         if (root == null) {
@@ -79,7 +136,7 @@ public class Codec {
         while (!queue.isEmpty()) {
             final int levelSize = queue.size();
             boolean allLeaves = true;
-            
+
             for (int i = 0; i < levelSize; i++) {
                 TreeNode node = queue.poll();
                 if (node == null) {
@@ -93,7 +150,7 @@ public class Codec {
 
                 allLeaves = allLeaves && (node.left == null && node.right == null);
             }
-            
+
             if (allLeaves) {
                 break;
             }
@@ -102,8 +159,7 @@ public class Codec {
         return sb.toString();
     }
 
-    // Decodes your encoded data to tree.
-    public TreeNode deserialize(String data) {
+    public TreeNode bfsDeserialize(String data) {
         if (data == null || data.length() == 0) {
             return null;
         }
