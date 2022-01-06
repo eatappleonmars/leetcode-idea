@@ -44,9 +44,7 @@ import utils.TreeNode;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class P863AllNodesDistanceKInBinaryTree {
     
@@ -62,49 +60,61 @@ public class P863AllNodesDistanceKInBinaryTree {
      */
     class Solution {
         public List<Integer> distanceK(TreeNode root, TreeNode target, int k) {
-            Deque<TreeNode> stack = new ArrayDeque<>();
-            buildPathFromRootToTarget(stack, root, target);
+            // We need two pieces of information:
+            // 1. location of the target node
+            // 2. given a node, how to trace back to its parent node
+            // Two options in general:
+            // 1. Create path from root to target [implemented below]
+            // 2. Create map { node : parent } of entire tree
+            Deque<TreeNode> rootToTargetStack = new ArrayDeque<>();
+            buildPathFromRootToTarget(rootToTargetStack, root, target);
 
-            Set<Integer> seen = new HashSet<>();
             List<Integer> res = new ArrayList<>();
             int distance = 0;
-            while (!stack.isEmpty()) {
-                TreeNode node = stack.pollFirst();
-                distanceK(node, distance, k, seen, res);
+            TreeNode prevNode = null;
+
+            while (!rootToTargetStack.isEmpty() && distance <= k) {
+                TreeNode node = rootToTargetStack.pollLast();
+                distanceK(node, prevNode, distance, k, res);
+                prevNode = node;
                 distance++;
             }
             return res;
         }
 
-        private boolean buildPathFromRootToTarget(Deque<TreeNode> stack, TreeNode node, TreeNode target) {
+        private boolean buildPathFromRootToTarget(Deque<TreeNode> rootToTargetStack, TreeNode node, TreeNode target) {
             if (node == null) {
                 return false;
             }
-            stack.offerFirst(node);
+
+            rootToTargetStack.offerLast(node);
+
             if (node.val == target.val) {
                 return true;
             }
-            boolean found = buildPathFromRootToTarget(stack, node.left, target);
-            if (!found) {
-                found = buildPathFromRootToTarget(stack, node.right, target);
-            }
-            if (!found) {
-                stack.pollFirst();
+            boolean found = buildPathFromRootToTarget(rootToTargetStack, node.left, target) || buildPathFromRootToTarget(rootToTargetStack, node.right, target);
+
+            if (!found) { // remote node from path
+                rootToTargetStack.pollLast();
             }
             return found;
         }
 
-        private void distanceK(TreeNode node, int distance, int k, Set<Integer> seen, List<Integer> res) {
-            if (node == null || distance > k || seen.contains(node.val)) {
+        private void distanceK(TreeNode currNode, TreeNode prevNode,int distance, int k, List<Integer> res) {
+            if (currNode == null) {
                 return;
             }
-            seen.add(node.val);
             if (distance == k) {
-                res.add(node.val);
+                res.add(currNode.val);
                 return;
             }
-            distanceK(node.left, distance + 1, k, seen, res);
-            distanceK(node.right, distance + 1, k, seen, res);
+            
+            if (currNode.left != prevNode) {
+                distanceK(currNode.left, currNode, distance + 1, k, res);    
+            }
+            if (currNode.right != prevNode) {
+                distanceK(currNode.right, currNode, distance + 1, k, res);    
+            }
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
