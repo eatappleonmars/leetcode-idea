@@ -40,8 +40,10 @@ package leetcode.editor.en;
 
 import utils.TreeNode;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class P199BinaryTreeRightSideView {
     
@@ -63,15 +65,38 @@ public class P199BinaryTreeRightSideView {
      */
     class Solution {
         public List<Integer> rightSideView(TreeNode root) {
-            List<Integer> result = new ArrayList<>();
+            List<Integer> res = new ArrayList<>();
             if (root == null) {
-                return result;
+                return res;
             }
-            helper(root, 0, result);
-            return result;
+//            bfs(root, res);
+            dfs(root, 0, res); // best
+            return res;
         }
 
-        private void helper(TreeNode root, int depth, List<Integer> result) {
+        public List<Integer> bfs(TreeNode root, List<Integer> res) {
+
+            Queue<TreeNode> queue = new ArrayDeque<>();
+            queue.offer(root);
+
+            while (!queue.isEmpty()) {
+                res.add(queue.peek().val);
+                int levelSize = queue.size();
+                for (int i = 0; i < levelSize; i++) {
+                    TreeNode node = queue.poll();
+                    if (node.right != null) {
+                        queue.offer(node.right);
+                    }
+                    if (node.left != null) {
+                        queue.offer(node.left);
+                    }
+                }
+            }
+            return res;
+
+        }
+
+        private void dfs(TreeNode root, int depth, List<Integer> result) {
             if (root == null) {
                 return;
             }
@@ -79,8 +104,8 @@ public class P199BinaryTreeRightSideView {
             if (depth == result.size()) {
                 result.add(root.val);
             }
-            helper(root.right, depth + 1, result);
-            helper(root.left, depth + 1, result);
+            dfs(root.right, depth + 1, result);
+            dfs(root.left, depth + 1, result);
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)
