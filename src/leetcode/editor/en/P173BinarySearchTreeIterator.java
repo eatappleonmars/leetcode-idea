@@ -121,13 +121,4 @@ public class P173BinarySearchTreeIterator {
      * boolean param_2 = obj.hasNext();
      */
     //leetcode submit region end(Prohibit modification and deletion)
-
-    
-    /**
-     * Test
-     */
-    public static void main(String[] args) {
-        Solution sol = new P173BinarySearchTreeIterator().new Solution();
-        
-    } 
 }
