@@ -87,59 +87,31 @@ public class P1123LowestCommonAncestorOfDeepestLeaves {
      * }
      */
     class Solution {
+
+        private int deepestDepth = 0;
+        private TreeNode lca = null;
+
         public TreeNode lcaDeepestLeaves(TreeNode root) {
-            DeepestLeaves deepestLeaves = new DeepestLeaves();
-            findDeepestNodes(root, 0, deepestLeaves);
-            return lca(root, deepestLeaves);
+            lcaHelper(root, 0);
+            return this.lca;
         }
 
-        class DeepestLeaves {
+        private int lcaHelper(TreeNode root, int depth) {
 
-            private int depth = 0;
-            private Set<Integer> leaves = new HashSet<>();
+            this.deepestDepth = Math.max(this.deepestDepth, depth);
 
-            public void update(TreeNode node, int depth) {
-                if (this.depth > depth) {
-                    return;
-                }
-                if (this.depth < depth) {
-                    this.depth = depth;
-                    this.leaves.clear();
-                }
-                this.leaves.add(node.val);
+            if (root == null) {
+                return depth;
             }
 
-            public boolean contains(TreeNode node) {
-                return this.leaves.contains(node.val);
-            }
-        }
+            int lt = lcaHelper(root.left, depth + 1);
+            int rt = lcaHelper(root.right, depth + 1);
 
-        private void findDeepestNodes(TreeNode root, int depth, DeepestLeaves deepestLeaves) {
-            if (root.left == null && root.right == null) {
-                deepestLeaves.update(root, depth);
-                return;
+            if (lt == this.deepestDepth && rt == this.deepestDepth) {
+                this.lca = root;
+                return this.deepestDepth;
             }
-            if (root.left != null) {
-                findDeepestNodes(root.left, depth + 1, deepestLeaves);
-            }
-            if (root.right != null) {
-                findDeepestNodes(root.right, depth + 1, deepestLeaves);
-            }
-        }
-
-        private TreeNode lca(TreeNode root, DeepestLeaves deepestLeaves) {
-            if (root == null || deepestLeaves.contains(root)) {
-                return root;
-            }
-            TreeNode lt = lca(root.left, deepestLeaves);
-            TreeNode rt = lca(root.right, deepestLeaves);
-            if (lt == null) {
-                return rt;
-            } else if (rt == null) {
-                return lt;
-            } else {
-                return root;
-            }
+            return Math.max(lt, rt);
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
