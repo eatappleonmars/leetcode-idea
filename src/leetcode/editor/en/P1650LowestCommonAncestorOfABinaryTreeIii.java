@@ -64,7 +64,9 @@ import utils.Node;
 import utils.TreeNode;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class P1650LowestCommonAncestorOfABinaryTreeIii {
     
@@ -81,20 +83,19 @@ public class P1650LowestCommonAncestorOfABinaryTreeIii {
 
     class Solution {
         public Node lowestCommonAncestor(Node p, Node q) {
-            Node root = null;
-            Map<Integer, Node> path = new HashMap<>();
+            Set<Integer> seen = new HashSet<>();
+
             while (p != null) {
-                path.put(p.val, p);
-                root = p;
+                seen.add(p.val);
                 p = p.parent;
             }
-            while (q != null) {
-                if (path.containsKey(q.val)) {
-                    return q;
-                }
+
+            while (q != null && !seen.contains(q.val)) {
                 q = q.parent;
+                continue;
             }
-            return root;
+
+            return q;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
