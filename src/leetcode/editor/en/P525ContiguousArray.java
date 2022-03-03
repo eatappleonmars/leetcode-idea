@@ -34,28 +34,32 @@ package leetcode.editor.en;
 
 // 2022-03-02 21:37:16
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class P525ContiguousArray {
     
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int findMaxLength(int[] nums) {
 
-            int[] prefixSum = new int[nums.length + 1];
-            for (int i = 1; i < prefixSum.length; i++) {
-                prefixSum[i] = prefixSum[i-1] + nums[i-1];
+            int res = 0;
+
+            // { prefixSum : index of first appearance }
+            Map<Integer, Integer> prefixMap = new HashMap<>();
+            prefixMap.put(0, -1);
+
+            int count = 0;
+            for (int i = 0; i < nums.length; i++) {
+                count += nums[i] == 0 ? -1 : 1;
+                if (!prefixMap.containsKey(count)) {
+                    prefixMap.put(count, i);
+                } else {
+                    res = Math.max(res, i - prefixMap.get(count));
+                }
             }
 
-            int windowSize = nums.length % 2 == 0 ? nums.length : nums.length - 1;
-            while (windowSize >= 2) {
-                for (int i = 1, j = i + windowSize - 1; j < prefixSum.length; i++, j++) {
-                    int windowSum = prefixSum[j] - prefixSum[i-1];
-                    if (windowSum << 1 ==  windowSize) {
-                        return windowSize;
-                    }
-                }
-                windowSize -= 2;
-            }
-            return 0;
+            return res;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
