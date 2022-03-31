@@ -65,27 +65,42 @@ public class P1631PathWithMinimumEffort {
     
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
+        private int minHeight, maxHeight;
         private int m, n;
-        private boolean[][] visited;
-        private int[][] directions = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
-
-        private int res = Integer.MAX_VALUE;
+        private final int[][] directions = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
 
         public int minimumEffortPath(int[][] heights) {
             this.m = heights.length;
             this.n = heights[0].length;
-            this.visited = new boolean[m][n];
 
-            dfs(heights, 0, 0, 0);
-            return this.res;
+            for (int row = 0; row < m; row++) {
+                for (int col = 0; col < n; col++) {
+                    this.minHeight = Math.min(this.minHeight, heights[row][col]);
+                    this.maxHeight = Math.max(this.maxHeight, heights[row][col]);
+                }
+            }
+
+            int minEffort = 0;
+            int maxEffort = this.maxHeight - this.minHeight;
+            int res = -1;
+
+            while (minEffort <= maxEffort) {
+                boolean[][] visited = new boolean[m][n];
+                int allowedEffort = (maxEffort + minEffort) / 2;
+                if (dfs(heights, 0, 0 ,allowedEffort, visited)) {
+                    res = allowedEffort;
+                    maxEffort = allowedEffort - 1;
+                } else {
+                    minEffort = allowedEffort + 1;
+                }
+            }
+
+            return res;
         }
 
-        private void dfs(int[][] heights, int currRow, int currCol, int effort) {
-            if (effort >= this.res) {
-                return;
-            }
+        private boolean dfs(int[][] heights, int currRow, int currCol, int allowedEffort, boolean[][] visited) {
             if (currRow == m - 1 && currCol == n - 1) {
-                this.res = effort;
+               return true;
             }
 
             visited[currRow][currCol] = true;
@@ -93,14 +108,17 @@ public class P1631PathWithMinimumEffort {
             for (int[] dir : directions) {
                 int nextRow = currRow + dir[0];
                 int nextCol = currCol + dir[1];
+
                 if (nextRow < 0 || nextRow >= m || nextCol < 0 || nextCol >= n || visited[nextRow][nextCol]) {
                     continue;
                 }
                 int nextEffort = Math.abs(heights[nextRow][nextCol] - heights[currRow][currCol]);
-                dfs(heights, nextRow, nextCol, Math.max(effort, nextEffort));
+                if (nextEffort <= allowedEffort && dfs(heights, nextRow, nextCol, allowedEffort, visited)) {
+                    return true;
+                }
             }
-
-            visited[currRow][currCol] = false;
+            // No need to backtrack by setting visited[currRow][currCol] = false here!!!
+            return false;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
