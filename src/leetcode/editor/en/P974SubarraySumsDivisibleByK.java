@@ -43,33 +43,24 @@ public class P974SubarraySumsDivisibleByK {
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int subarraysDivByK(int[] nums, int k) {
-            int res = 0;
-            // { prefixSumMod : count }
-            Map<Integer, Integer> prefixSumModMap = new HashMap<>();
-            prefixSumModMap.put(0, 1);
+            int[] modCounts = new int[10001];
+            modCounts[0] = 1;
 
-            int prefixSumMod = 0;
+            int prefixMod = 0;
+            int resCount = 0;
+
             for (int n : nums) {
-                prefixSumMod = (prefixSumMod + n) % k; // [-k, k]
-
-//                // Analysis
-//                // target: (a - target) % k == 0
-//                // 0. target == a
-//                // 1. target == a + k
-//                // 2. target == a - k
-//                res += prefixSumModMap.getOrDefault(prefixSumMod, 0);
-//                res += prefixSumModMap.getOrDefault(prefixSumMod + k, 0);
-//                res += prefixSumModMap.getOrDefault(prefixSumMod - k, 0);
-
-                if (prefixSumMod < 0) {
-                    prefixSumMod += k;
+                prefixMod = (prefixMod + n) % k;
+                // % in Java means remaining, the result can be negative. Need to +k to make it positive
+                // so that it equals to mathematical mod result
+                if (prefixMod < 0) {
+                    prefixMod += k;
                 }
-                res += prefixSumModMap.getOrDefault(prefixSumMod, 0);
-
-                prefixSumModMap.put(prefixSumMod, prefixSumModMap.getOrDefault(prefixSumMod, 0) + 1);
+                resCount += modCounts[prefixMod];
+                modCounts[prefixMod]++;
             }
 
-            return res;
+            return resCount;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
