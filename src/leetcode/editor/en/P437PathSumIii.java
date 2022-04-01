@@ -60,32 +60,28 @@ public class P437PathSumIii {
  */
 class Solution {
 
-    private int res = 0;
-
-    private int targetSum;
-    private Map<Integer, Integer> prefixSumMap = new HashMap<>();
-
     public int pathSum(TreeNode root, int targetSum) {
-        this.targetSum = targetSum;
-        this.prefixSumMap.put(0, 1);
-
-        preOrder(root, 0);
-        return this.res;
+        // { prefixSum : count }
+        Map<Integer, Integer> prefixSumMap = new HashMap<>();
+        prefixSumMap.put(0, 1);
+        return dfs(root, 0, targetSum, prefixSumMap);
     }
 
-    private void preOrder(TreeNode root, int prefixSum) {
+    private int dfs(TreeNode root, int prefixSum, int targetSum, Map<Integer, Integer> map) {
         if (root == null) {
-            return;
+            return 0;
         }
-
         prefixSum += root.val;
-        this.res += prefixSumMap.getOrDefault(prefixSum - targetSum, 0);
-        prefixSumMap.put(prefixSum, prefixSumMap.getOrDefault(prefixSum, 0) + 1);
 
-        preOrder(root.left, prefixSum);
-        preOrder(root.right, prefixSum);
+        int count = map.getOrDefault(prefixSum - targetSum, 0);
+        map.put(prefixSum, map.getOrDefault(prefixSum, 0) + 1);
 
-        prefixSumMap.put(prefixSum, prefixSumMap.get(prefixSum) - 1);
+        count += dfs(root.left, prefixSum, targetSum, map);
+        count += dfs(root.right, prefixSum, targetSum, map);
+
+        map.put(prefixSum, map.get(prefixSum) - 1); // backtrack
+
+        return count;
     }
 }
 //leetcode submit region end(Prohibit modification and deletion)
