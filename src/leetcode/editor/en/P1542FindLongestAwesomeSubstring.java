@@ -55,33 +55,32 @@ public class P1542FindLongestAwesomeSubstring {
         // each contained digit is even, or
         // at most one digit among all is odd
         public int longestAwesome(String s) {
+            // { mask : first index }
+            Map<Integer, Integer> seenMasksMap = new HashMap<>();
+            seenMasksMap.put(0, -1);
 
             int maxLen = 1;
 
-            // { seen mask : index }
-            Map<Integer, Integer> seen = new HashMap<>();
-            seen.put(0, -1);
-
+            // Mask represents distribution of odd/even numbers. 0 if even and 1 if odd.
+            // Example: mask = 1 1 0 means:
+            // - number 2 is odd
+            // - number 1 is odd
+            // - number 0 is even
+            // If same mask is seen before, then all odd counts can be cancelled out.
             int mask = 0;
-            for (int i = 0; i < s.length(); i++) {
-                int digit = s.charAt(i) - '0';
-                mask ^= (1 << digit); // flip bit in mask to represent even/odd count
-                seen.putIfAbsent(mask, i);
-                // First candidate
-                maxLen = Math.max(maxLen, i - seen.get(mask));
-                // Other 10 candidates
-                for (int j = 0; j < 10; j++) {
-                    // Get candidate by flipping only i-th bit in mask
-                    // Example: mask = 7626
-                    //        9 8 7 6 5 4 3 2 1 0
-                    // mask:  0 0 1 0 0 0 0 1 0 0 (mask: 7626)
-                    // flip-2: 0 0 1 0 0 0 0 0 0 0 (mask: 7, seen before)
-                    // If "flip-2" exists, it means "2" can be kept odd while
-                    // other odd digits such as "7" can be cancelled out
 
+            for (int i = 0; i < s.length(); i++) {
+                mask ^= (1 << (s.charAt(i) - '0'));
+                seenMasksMap.putIfAbsent(mask, i);
+
+                maxLen = Math.max(maxLen, i - seenMasksMap.get(mask));
+
+                for (int j = 0; j <= 9; j++) {
                     int candidate = mask ^ (1 << j);
-                    if (seen.containsKey(candidate)) {
-                        maxLen = Math.max(maxLen, i - seen.get(candidate));
+                    if (candidate != mask) {
+                        // Bit '1' has been turned into bit '0' at index j, indicating we allow
+                        // digit j to remain odd and hence all other odd numbers must be cancelled out (seen)
+                        maxLen = Math.max(maxLen, i - seenMasksMap.getOrDefault(candidate, i));
                     }
                 }
             }
