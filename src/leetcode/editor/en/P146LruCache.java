@@ -82,7 +82,7 @@ public class P146LruCache {
 
         public LRUCache(int capacity) {
             this.capacity = capacity;
-            this.map = new HashMap<>(capacity, 1);
+            this.map = new HashMap<>(capacity);
             this.head = new LRUNode(-1, -1);
             this.tail = new LRUNode(-1, -1);
             this.head.next = tail;
@@ -90,7 +90,7 @@ public class P146LruCache {
         }
 
         public int get(int key) {
-            LRUNode node = map.getOrDefault(key, null);
+            LRUNode node = map.get(key);
             if (node == null) {
                 return -1;
             }
@@ -98,58 +98,45 @@ public class P146LruCache {
             return node.val;
         }
 
+        public void put(int key, int value) {
+            LRUNode node = map.get(key);
+            if (node != null) {
+                node.val = value;
+                moveToFirst(node);
+            } else {
+                LRUNode newNode = new LRUNode(key, value);
+                addNode(newNode);
+                map.put(key, newNode);
+
+                if (map.size() > this.capacity) {
+                    LRUNode last = this.tail.prev;
+                    removeNodeFromList(last);
+                    map.remove(last.key);
+                }
+            }
+        }
+
         private void moveToFirst(LRUNode node) {
+            removeNodeFromList(node);
+            addNode(node);
+        }
+
+        private void removeNodeFromList(LRUNode node) {
             LRUNode prev = node.prev;
             LRUNode next = node.next;
 
             prev.next = next;
             next.prev = prev;
-
-            node.prev = null;
-            node.next = null;
-            addToFirst(node);
         }
 
-        public void put(int key, int value) {
-            LRUNode node = map.getOrDefault(key, null);
-            if (node != null) {
-                node.val = value;
-                moveToFirst(node);
-            } else {
-                evictIfFull();
-                LRUNode newNode = new LRUNode(key, value);
-                addToFirst(newNode);
-                map.put(key, newNode);
-            }
-        }
-
-        private void addToFirst(LRUNode node) {
+        private void addNode(LRUNode node) {
             LRUNode first = this.head.next;
 
-            this.head.next = node;
             node.prev = this.head;
-
             node.next = first;
+
+            this.head.next = node;
             first.prev = node;
-        }
-
-        // Evict when reaching capacity:
-        // - Remove last node in list
-        // - Remove entry in map
-        private void evictIfFull() {
-            if (map.size() < capacity) {
-                return;
-            }
-            LRUNode last = this.tail.prev;
-            LRUNode secondLast = last.prev;
-
-            secondLast.next = this.tail;
-            this.tail.prev = secondLast;
-
-            last.prev = null;
-            last.next = null;
-
-            map.remove(last.key);
         }
     }
 
