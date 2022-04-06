@@ -147,13 +147,4 @@ public class P146LruCache {
      * obj.put(key,value);
      */
     //leetcode submit region end(Prohibit modification and deletion)
-
-    
-    /**
-     * Test
-     */
-    public static void main(String[] args) {
-        Solution sol = new P146LruCache().new Solution();
-        
-    } 
 }
