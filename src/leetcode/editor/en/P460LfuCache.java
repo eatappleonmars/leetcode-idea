@@ -89,9 +89,7 @@ public class P460LfuCache {
     class LFUCache {
 
         class LFUNode {
-            int key;
-            int val;
-            int frequency;
+            int key, val, frequency;
             LFUNode prev, next; // double linked
 
             LFUNode(int key, int val) {
@@ -100,19 +98,11 @@ public class P460LfuCache {
                 this.frequency = 1;
             }
 
-            void linkToNext(LFUNode next) {
-                this.next = next;
-                next.prev = this;
-            }
-
-            void linkToPrev(LFUNode prev) {
+            void insert(LFUNode prev, LFUNode next) {
                 prev.next = this;
                 this.prev = prev;
-            }
-
-            void insert(LFUNode prev, LFUNode next) {
-                linkToPrev(prev);
-                linkToNext(next);
+                this.next = next;
+                next.prev = this;
             }
 
             void removeSelf() {
@@ -123,13 +113,10 @@ public class P460LfuCache {
 
         class LFUBlock {
             int size;
-            int frequency;
             LFUNode headNode, tailNode;
-            LFUBlock prev, next; // double linked
 
-            LFUBlock(int frequency) {
+            LFUBlock() {
                 this.size = 0;
-                this.frequency = frequency;
                 this.headNode = new LFUNode(-1, -1);
                 this.tailNode = new LFUNode(-1, -1);
 
@@ -137,39 +124,14 @@ public class P460LfuCache {
                 this.tailNode.prev = this.headNode;
             }
 
-            LFUBlock(int frequency, LFUBlock prevBlock, LFUBlock nextBlock) {
-                this(frequency);
-                insert(prevBlock, nextBlock);
-            }
-
-            void linkToPrev(LFUBlock prev) {
-                prev.next = this;
-                this.prev = prev;
-            }
-
-            void linkToNext(LFUBlock next) {
-                this.next = next;
-                next.prev = this;
-            }
-
-            void insert(LFUBlock prev, LFUBlock next) {
-                linkToPrev(prev);
-                linkToNext(next);
-            }
-
-            void removeSelf() {
-                this.prev.next = this.next;
-                this.next.prev = this.prev;
-            }
-
             // Add node to the block as the first node
-            void addNodeToFirst(LFUNode node) {
+            void add(LFUNode node) {
                 this.size++;
                 node.insert(this.headNode, this.headNode.next);
             }
 
             // Remove node from block
-            void removeNode(LFUNode node) {
+            void remove(LFUNode node) {
                 this.size--;
                 node.removeSelf();
             }
@@ -177,31 +139,22 @@ public class P460LfuCache {
             // Remove the last node from block
             LFUNode removeLastNode() {
                 LFUNode last = this.tailNode.prev;
-                removeNode(last);
+                remove(last);
                 return last;
             }
         }
 
-        // Evict capacity
+        private int minFrequency;
         private final int capacity;
-        // { key : LFUNode }
-        Map<Integer, LFUNode> cacheMap;
-        // { frequency : LFUBlock }
-        Map<Integer, LFUBlock> frequencyMap;
-        // Maintain LFUBlock double linked list in order to track the least frequency
-        LFUBlock headBlock, tailBlock;
+        Map<Integer, LFUNode> cacheMap; // { key : LFUNode }
+        Map<Integer, LFUBlock> frequencyMap; // { frequency : LFUBlock }
 
         // Main entry method
         public LFUCache(int capacity) {
-
+            this.minFrequency = 0;
             this.capacity = capacity;
             this.cacheMap = new HashMap<>(capacity);
             this.frequencyMap = new HashMap<>();
-
-            // Initialize LFU Block double linked list
-            this.headBlock = new LFUBlock(0);
-            this.tailBlock = new LFUBlock(0);
-            this.tailBlock.linkToPrev(this.headBlock);
         }
 
         public int get(int key) {
@@ -212,7 +165,7 @@ public class P460LfuCache {
             if (node == null) {
                 return -1;
             }
-            increaseFrequency(node);
+            update(node);
             return node.val;
         }
 
@@ -221,48 +174,37 @@ public class P460LfuCache {
                 return;
             }
             LFUNode node = this.cacheMap.get(key);
-            // Node already exists. Update
             if (node != null) {
                 node.val = value;
-                increaseFrequency(node);
+                update(node);
                 return;
             }
-            // Evict
+            // Evict least frequent, least recently used node
             if (this.cacheMap.size() == this.capacity) {
-                LFUBlock lastBlock = this.tailBlock.prev;
-                LFUNode lastNode = lastBlock.removeLastNode();
-                if (lastBlock.size == 0) {
-                    lastBlock.removeSelf();
-                    this.frequencyMap.remove(lastNode.frequency);
-                }
+                LFUNode lastNode = this.frequencyMap.get(this.minFrequency).removeLastNode();
                 this.cacheMap.remove(lastNode.key);
             }
             // Create new node
             node = new LFUNode(key, value);
             this.cacheMap.put(key, node);
-            // Add node to block of frequency == 1
-//            addNodeToFrequencyMap(node, this.tailBlock.prev, this.tailBlock);
-            LFUBlock targetBlock = this.frequencyMap.computeIfAbsent(node.frequency, freq -> new LFUBlock(freq, this.tailBlock.prev, this.tailBlock));
-            targetBlock.addNodeToFirst(node);
-
-
+            this.minFrequency = 1;
+            addNodeToBlock(node);
         }
 
-        // Increase existing node frequency by 1. Update frequency map accordingly.
-        private void increaseFrequency(LFUNode node) {
+        private void update(LFUNode node) {
             // Remove node from its current block
             LFUBlock currBlock = this.frequencyMap.get(node.frequency);
-            currBlock.removeNode(node);
-            // Increment
-            node.frequency++;
-            // Get block of new frequency. If not exist, create new block
-            LFUBlock targetBlock = this.frequencyMap.computeIfAbsent(node.frequency, freq -> new LFUBlock(freq, currBlock.prev, currBlock));
-            targetBlock.addNodeToFirst(node);
-            // Clean up empty block
-            if (currBlock.size == 0) {
-                currBlock.removeSelf();
-                this.frequencyMap.remove(node.frequency - 1);
+            currBlock.remove(node);
+            if (node.frequency == this.minFrequency && currBlock.size == 0) {
+                this.minFrequency++;
             }
+            node.frequency++;
+            addNodeToBlock(node);
+        }
+
+        private void addNodeToBlock(LFUNode node) {
+            LFUBlock targetBlock = this.frequencyMap.computeIfAbsent(node.frequency, freq -> new LFUBlock());
+            targetBlock.add(node);
         }
     }
 
