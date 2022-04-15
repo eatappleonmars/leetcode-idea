@@ -130,13 +130,4 @@ public class P716MaxStack {
      * int param_5 = obj.popMax();
      */
     //leetcode submit region end(Prohibit modification and deletion)
-
-    
-    /**
-     * Test
-     */
-    public static void main(String[] args) {
-        Solution sol = new P716MaxStack().new Solution();
-        
-    } 
 }

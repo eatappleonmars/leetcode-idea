@@ -121,13 +121,4 @@ public class P380InsertDeleteGetrandomO1 {
      * int param_3 = obj.getRandom();
      */
     //leetcode submit region end(Prohibit modification and deletion)
-
-    
-    /**
-     * Test
-     */
-    public static void main(String[] args) {
-        Solution sol = new P380InsertDeleteGetrandomO1().new Solution();
-        
-    } 
 }
