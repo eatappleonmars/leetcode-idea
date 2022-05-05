@@ -36,10 +36,11 @@ public class P253MeetingRoomsIi {
         public int minMeetingRooms(int[][] intervals) {
             Arrays.sort(intervals, Comparator.comparingInt(interval -> interval[0]));
             Queue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(interval -> interval[1]));
-
-            int res = 0;
-            for (int[] interval : intervals) {
-                if (!pq.isEmpty() && pq.peek()[1] <= interval[0]) {
+            pq.offer(intervals[0]);
+            int res = 1;
+            for (int i = 1; i < intervals.length; i++) {
+                int[] interval = intervals[i];
+                if (pq.peek()[1] <= interval[0]) { // some meeting has ended
                     pq.poll();
                 }
                 pq.offer(interval);
