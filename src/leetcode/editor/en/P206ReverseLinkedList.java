@@ -68,11 +68,14 @@ public class P206ReverseLinkedList {
         private ListNode iterativeSolution(ListNode head) {
             ListNode dummyHead = new ListNode();
             while (head != null) {
-                ListNode first = dummyHead.next;
-                ListNode next = head.next;
+                // dummy -> null
+                // dummy -> currFirst -> null
+                // dummy -> head -> currFirst -> null
+                ListNode currFirst = dummyHead.next;
+                ListNode nextHead = head.next;
                 dummyHead.next = head;
-                head.next = first;
-                head = next;
+                head.next = currFirst;
+                head = nextHead;
             }
             return dummyHead.next;
         }
