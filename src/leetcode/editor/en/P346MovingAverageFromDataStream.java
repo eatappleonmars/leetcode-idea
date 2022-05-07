@@ -77,13 +77,4 @@ public class P346MovingAverageFromDataStream {
      * double param_1 = obj.next(val);
      */
     //leetcode submit region end(Prohibit modification and deletion)
-
-    
-    /**
-     * Test
-     */
-    public static void main(String[] args) {
-        Solution sol = new P346MovingAverageFromDataStream().new Solution();
-        
-    } 
 }
