@@ -74,6 +74,7 @@ public class P199BinaryTreeRightSideView {
             return res;
         }
 
+        // Level traverse order from right to left
         public List<Integer> bfs(TreeNode root, List<Integer> res) {
 
             Queue<TreeNode> queue = new ArrayDeque<>();
