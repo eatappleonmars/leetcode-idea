@@ -17,8 +17,9 @@ class P208ImplementTriePrefixTreeTest {
     @Test
     public void test1() {
         trie.insert("abc");
-        trie.insert("abd");
+        trie.insert("db");
         assertTrue(trie.search("abc"));
         assertTrue(trie.startsWith("a"));
+        assertFalse(trie.search("dbc"));
     }
 }
