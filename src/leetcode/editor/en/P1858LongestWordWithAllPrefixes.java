@@ -58,14 +58,59 @@ public class P1858LongestWordWithAllPrefixes {
     
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
-        public String longestWord(String[] words) {
 
+        class TrieNode {
+            boolean end;
+            TrieNode[] children = new TrieNode[26];
+        }
+
+        public String longestWord(String[] words) {
+            // Sort by word length, then by lexi order
             Arrays.sort(words, (w1, w2) -> {
                 if (w1.length() != w2.length()) {
                     return w1.length() - w2.length();
                 }
                 return w1.compareTo(w2);
             });
+
+//            return solveUsingMap(words);
+            return solveUsingTrie(words);
+        }
+
+        private String solveUsingTrie(String[] words) {
+
+            TrieNode root = new TrieNode();
+            String res = "";
+
+            for (String word : words) {
+
+                TrieNode trieNode = root;
+                int prefixCount = 0;
+
+                for (char c : word.toCharArray()) {
+                    int i = c - 'a';
+                    if (trieNode.children[i] == null) {
+                        trieNode.children[i] = new TrieNode();
+                    }
+                    trieNode = trieNode.children[i];
+                    prefixCount += trieNode.end ? 1 : 0;
+                }
+
+                trieNode.end = true;
+                prefixCount++;
+
+                if (word.length() == prefixCount && word.length() > res.length()) {
+                    res = word;
+                    if (res.length() == words[words.length - 1].length()) {
+                        break;
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        private String solveUsingMap(String[] words) {
 
             Map<String, Integer> map = new HashMap<>();
             String res = "";
@@ -86,13 +131,6 @@ public class P1858LongestWordWithAllPrefixes {
             }
 
             return res;
-        }
-
-        private String takeLongestWord(String s, String candidate) {
-            if (s == null) {
-                return candidate;
-            }
-            return s.compareTo(candidate) < 0 ? s : candidate;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
