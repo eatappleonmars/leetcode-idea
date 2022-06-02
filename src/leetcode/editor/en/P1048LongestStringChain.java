@@ -72,22 +72,31 @@ public class P1048LongestStringChain {
         public int longestStrChain(String[] words) {
 
             int result = 0;
-
-            Arrays.sort(words, Comparator.comparingInt(String::length)); // sort based on string length
             int[] dp = new int[words.length];
 
-            for (int j = 1; j < words.length; j++) {
+            int currLen = 0;
+            int currLenBeginIndex = 0;
+
+            Arrays.sort(words, Comparator.comparingInt(String::length)); // sort based on string length
+
+            for (int j = 0; j < words.length; j++) {
                 String s2 = words[j];
                 int s2Len = s2.length();
 
-                for (int i = j - 1; i >= 0; i--) {
+                if (s2Len != currLen) {
+                    currLen = s2Len;
+                    currLenBeginIndex = j;
+                }
+
+                for (int i = currLenBeginIndex - 1; i >= 0; i--) {
                     String s1 = words[i];
                     int s1Len = s1.length();
 
                     if (s1Len + 1 < s2Len) {
                         break;
                     }
-                    if (s1Len + 1 == s2Len && predecessorCheck(s1, s2)) {
+
+                    if (predecessorCheck(s1, s2)) {
                         dp[j] = Math.max(dp[j], dp[i] + 1);
                         result = Math.max(result, dp[j]);
                     }
@@ -99,13 +108,13 @@ public class P1048LongestStringChain {
         // s1 is the shorter string that has length L
         // s2 is the longer string that has length L + 1
         private boolean predecessorCheck(String s1, String s2) {
-            int mismatchCount = 0;
+            int tolerance = 1;
             for (int i = 0, j = 0; i < s1.length(); i++, j++) {
                 if (s2.charAt(j) != s1.charAt(i)) {
-                    mismatchCount++;
-                    if (mismatchCount == 2) {
+                    if (tolerance == 0) {
                         return false;
                     }
+                    tolerance--;
                     i--;
                 }
             }
