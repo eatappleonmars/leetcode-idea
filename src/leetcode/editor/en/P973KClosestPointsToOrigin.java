@@ -60,17 +60,13 @@ public class P973KClosestPointsToOrigin {
         }
 
         private int[][] solveWithArraySort(int[][] points, int k) {
-            final Function<int[], Integer> sqDistanceFunc = (point) -> {
-                return point[0] * point[0] + point[1] * point[1];
-            };
-            Arrays.sort(points, Comparator.comparing(sqDistanceFunc));
+            Arrays.sort(points, Comparator.comparingInt(point -> sqDistance(point)));
             return Arrays.copyOfRange(points, 0, k);
         }
 
         private int[][] solveWithHeap(int[][] points, int k) {
-            Queue<int[]> maxHeap = new PriorityQueue<>(k, (p1, p2) -> {
-                return sqDistance(p2) - sqDistance(p1);
-            });
+
+            Queue<int[]> maxHeap = new PriorityQueue<>(k, Comparator.comparingInt(point -> -sqDistance(point)));
 
             for (int[] point : points) {
                 maxHeap.offer(point);
