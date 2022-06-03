@@ -69,40 +69,27 @@ public class P443StringCompression {
         public int compress(char[] chars) {
 
             // Index to be written
-            int writeIndex = 1;
+            int writeIndex = 0;
 
-            // Keep track of char and count
-            char prevChar = chars[0];
-            char prevCount = 1;
+            int count = 0;
 
-            for (int i = 1; i < chars.length; i++) {
+            for (int i = 0; i < chars.length; i++) {
                 char currChar = chars[i];
-                if (currChar == prevChar) {
-                    prevCount++;
-                } else {
-                    writeIndex = writeCount(chars, prevCount, writeIndex);
+                count++;
+                // Last char or different char
+                if (i == chars.length - 1 || currChar != chars[i + 1]) {
                     chars[writeIndex++] = currChar;
+                    if (count > 1) {
+                        char[] counts = String.valueOf(count).toCharArray();
+                        for (char digitChar : counts) {
+                            chars[writeIndex++] = digitChar;
+                        }
+                    }
                     // reset
-                    prevChar = currChar;
-                    prevCount = 1;
+                    count = 0;
                 }
             }
-            // Need to write last count at the end
-            return writeCount(chars, prevCount, writeIndex);
-        }
-
-        // Return next write index after this operation
-        private int writeCount(char[] chars, int count, int writeIndex) {
-            if (count == 1) {
-                return writeIndex;
-            }
-            int nextWriteIndex = writeIndex + (int) Math.log10(count) + 1;
-            writeIndex = nextWriteIndex - 1;
-            while (count > 0) {
-                chars[writeIndex--] = Character.forDigit(count % 10, 10);
-                count /= 10;
-            }
-            return nextWriteIndex;
+            return writeIndex;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
