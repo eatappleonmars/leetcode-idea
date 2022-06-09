@@ -73,106 +73,112 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class P355DesignTwitter {
     
     //leetcode submit region begin(Prohibit modification and deletion)
     class Twitter {
-        
+
         class Tweet {
-            int userId, tweetId, timestamp;
-            Tweet(int uid, int tid, int time) {
-                this.userId = uid;
-                this.tweetId = tid;
-                this.timestamp = time;
+            int tweetId;
+            int userId;
+            int timestamp;
+
+            Tweet next;
+
+            Tweet(int tweetId, int userId) {
+                this.tweetId = tweetId;
+                this.userId = userId;
+                this.timestamp = globalTimestamp;
+                globalTimestamp++;
             }
         }
 
         class User {
             int userId;
-            List<Tweet> tweets; // user's own up to latest 10 tweets
-            Set<Integer> followingUserIds; // this user is following these users
+            Set<Integer> followees; // In pull model, keep track of users whom current user is following
+            Tweet myTweets; // Current user's tweets
 
-            User(int id) {
-                this.userId = id;
-                this.tweets = new LinkedList<>();
-                this.followingUserIds = new HashSet<>();
-                this.followingUserIds.add(this.userId); // follow self
+            public User(int userId) {
+                this.userId = userId;
+                this.followees = new HashSet<>();
+                this.followees.add(userId); // follow self so that feeds include self tweets
             }
 
-            void postTweet(Tweet tweet) {
-                this.tweets.add(0, tweet);
-                if (this.tweets.size() > 10) {
-                    this.tweets.remove(this.tweets.size() - 1);
+            void follow(int followeeId) {
+                this.followees.add(followeeId);
+            }
+
+            void unfollow(int followeeId) {
+                this.followees.remove(followeeId);
+            }
+
+            Tweet tweet(int tweetId) {
+                Tweet t = new Tweet(tweetId, userId);
+                t.next = myTweets;
+                myTweets = t;
+                return myTweets;
+            }
+
+            List<Integer> getTop10Feed() {
+                List<Integer> top10 = new LinkedList<>();
+
+                // Create and initialize max heap
+                Queue<Tweet> maxHeap = new PriorityQueue<>(Comparator.comparingInt(tweet -> -tweet.timestamp));
+                for (int followeeId : followees) {
+                    User followee = userPool.get(followeeId);
+                    Tweet followeeTweets = followee.myTweets;
+                    if (followeeTweets != null) {
+                        maxHeap.offer(followeeTweets);
+                    }
                 }
-            }
 
-            void follow(User toFollow) {
-                this.followingUserIds.add(toFollow.userId);
-            }
+                // Collect top 10 latest
+                while (!maxHeap.isEmpty() && top10.size() < 10) {
+                    Tweet tweet = maxHeap.poll();
+                    top10.add(tweet.tweetId);
+                    if (tweet.next != null) {
+                        tweet = tweet.next;
+                        maxHeap.offer(tweet);
+                    }
+                }
 
-            void unfollow(User toUnfollow) {
-                this.followingUserIds.remove(toUnfollow.userId);
+                return top10;
             }
         }
 
-        private int timestamp;
-        private final Map<Integer, User> userMap;
+        private int globalTimestamp;
+        private Map<Integer, User> userPool;
 
         public Twitter() {
-            this.timestamp = 0;
-            this.userMap = new HashMap<>();
+            this.globalTimestamp = 0;
+            this.userPool = new HashMap<>();
         }
 
         public void postTweet(int userId, int tweetId) {
-            User user = this.userMap.computeIfAbsent(userId, User::new);
-            Tweet tweet = new Tweet(userId, tweetId, this.timestamp);
-            this.timestamp++;
-            user.postTweet(tweet);
+            // 1. Create tweet
+            User user = userPool.computeIfAbsent(userId, User::new);
+            user.tweet(tweetId);
         }
 
         public List<Integer> getNewsFeed(int userId) {
-            User user = this.userMap.get(userId);
-            if (user == null) {
+            if (!userPool.containsKey(userId)) {
                 return List.of();
             }
-
-            Queue<Tweet> tweetPriorityQueue = new PriorityQueue<>(Comparator.comparingInt(tweet -> -tweet.timestamp));
-            Map<Integer, Iterator<Tweet>> iteratorMap = new HashMap<>();
-            
-            for (int followingUserId : user.followingUserIds) {
-                User followingUser = this.userMap.get(followingUserId);
-                Iterator<Tweet> iterator = followingUser.tweets.iterator();
-                if (iterator.hasNext()) {
-                    tweetPriorityQueue.offer(iterator.next());
-                    iteratorMap.put(followingUserId, iterator);
-                }
-            }
-
-            List<Integer> res = new LinkedList<>();
-            while (res.size() < 10 && !tweetPriorityQueue.isEmpty()) {
-                Tweet tweet = tweetPriorityQueue.poll();
-                Iterator<Tweet> iterator = iteratorMap.get(tweet.userId);
-                if (iterator.hasNext()) {
-                    tweetPriorityQueue.offer(iterator.next());
-                }
-                res.add(tweet.tweetId);
-            }
-            
-            return res;
+            return userPool.get(userId).getTop10Feed();
         }
 
         public void follow(int followerId, int followeeId) {
-            User follower = this.userMap.computeIfAbsent(followerId, User::new);
-            User followee = this.userMap.computeIfAbsent(followeeId, User::new);
-            follower.follow(followee);
+            User follower = userPool.computeIfAbsent(followerId, User::new);
+            userPool.computeIfAbsent(followeeId, User::new);
+            follower.follow(followeeId);
         }
 
         public void unfollow(int followerId, int followeeId) {
-            User follower = this.userMap.computeIfAbsent(followerId, User::new);
-            User followee = this.userMap.computeIfAbsent(followeeId, User::new);
-            follower.unfollow(followee);
+            if (!userPool.containsKey(followerId)) {
+                return;
+            }
+            userPool.get(followerId).unfollow(followeeId);
         }
     }
 
@@ -185,4 +191,19 @@ public class P355DesignTwitter {
      * obj.unfollow(followerId,followeeId);
      */
     //leetcode submit region end(Prohibit modification and deletion)
+    public static void main(String[] args) {
+        Queue<Integer> pq = new PriorityQueue<>();
+        pq.offer(3);
+        pq.offer(1);
+        pq.offer(2);
+
+        for (int n : pq) {
+            System.out.print(n + " "); // 1 3 2
+        }
+
+        System.out.println();
+
+        Iterator<Integer> iter = pq.iterator();
+        iter.forEachRemaining(System.out::println); // 1 3 2
+    }
 }
