@@ -71,8 +71,11 @@ import utils.TreeNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.TreeMap;
 
 public class P987VerticalOrderTraversalOfABinaryTree {
@@ -94,39 +97,54 @@ public class P987VerticalOrderTraversalOfABinaryTree {
      * }
      */
     class Solution {
-        // NOTE: ambiguous requirement
+        // NOTE: ambiguous requirement in problem description
         // Clarification:
-        // For points in the same column
-        // - node on higher level(close to root) goes first
-        // - if they also in the same level, order from small to large
-        public List<List<Integer>> verticalTraversal(TreeNode root) {
-            // { column : { row : [values] } }
-            Map<Integer, TreeMap<Integer, List<Integer>>> map = new HashMap<>();
-            int[] minCol = {0};
-            verticalTraversal(root, 0, 0, minCol, map);
+        // For tree nodes in the same column
+        // - node with smaller row goes first
+        // - for nodes on the same row, node with smaller val goes first
 
+        class NodeInfo {
+            int row;
+            int val;
+            NodeInfo (int r, int v) {
+                row = r;
+                val = v;
+            }
+        }
+
+        public List<List<Integer>> verticalTraversal(TreeNode root) {
+
+            // { Sorted column : NodeInfo Priority Queue }
+            // Priority Queue sort by row first, then by tree node value
+            TreeMap<Integer, Queue<NodeInfo>> map = new TreeMap<>();
+            traverse(root, 0, 0, map);
+            // Convert to list of list
             List<List<Integer>> res = new ArrayList<>();
-            for (int col = minCol[0]; col < map.size() + minCol[0]; col++) {
-                List<Integer> valuesInSameColumn = new ArrayList<>();
-                TreeMap<Integer, List<Integer>> rowToValuesMap = map.get(col);
-                for (int row : rowToValuesMap.keySet()) {
-                    List<Integer> valuesInSameRow = rowToValuesMap.get(row);
-                    Collections.sort(valuesInSameRow);
-                    valuesInSameColumn.addAll(valuesInSameRow);
+            for (Map.Entry<Integer, Queue<NodeInfo>> entry : map.entrySet()) {
+                Queue<NodeInfo> nodes = entry.getValue(); // sorted nodes on the same column
+                List<Integer> vals = new ArrayList<>();
+                while (!nodes.isEmpty()) {
+                    vals.add(nodes.poll().val);
                 }
-                res.add(valuesInSameColumn);
+                res.add(vals);
             }
             return res;
         }
 
-        private void verticalTraversal(TreeNode root, int row, int col, int[] minCol, Map<Integer, TreeMap<Integer, List<Integer>>> map) {
+        private void traverse(TreeNode root, int row, int col, Map<Integer, Queue<NodeInfo>> map) {
             if (root == null) {
                 return;
             }
-            minCol[0] = Math.min(minCol[0], col);
-            map.computeIfAbsent(col, key -> new TreeMap<>()).computeIfAbsent(row, key -> new ArrayList<>()).add(root.val);
-            verticalTraversal(root.left, row + 1, col - 1, minCol, map);
-            verticalTraversal(root.right, row + 1, col + 1, minCol, map);
+            Queue<NodeInfo> pq = map.computeIfAbsent(col, c -> new PriorityQueue<>((n1, n2) -> {
+                if (n1.row == n2.row) {
+                    return n1.val - n2.val;
+                }
+                return n1.row - n2.row;
+            }));
+            pq.offer(new NodeInfo(row, root.val));
+
+            traverse(root.left, row + 1, col - 1, map);
+            traverse(root.right, row + 1, col + 1, map);
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
