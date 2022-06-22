@@ -26,20 +26,16 @@
 package leetcode.editor.en;
 
 // 2021-11-22 21:15:10
-
-import java.util.PriorityQueue;
-import java.util.Queue;
-
 public class P215KthLargestElementInAnArray {
     
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int findKthLargest(int[] nums, int k) {
-            quickSort(nums, 0, nums.length - 1, k - 1);
+            quickSelect(nums, 0, nums.length - 1, k - 1);
             return nums[k - 1];
         }
 
-        private void quickSort(int[] nums, int beg, int end, final int targetIndex) {
+        private void quickSelect(int[] nums, int beg, int end, final int targetIndex) {
             if (beg >= end || beg > targetIndex || end < targetIndex) {
                 return;
             }
@@ -47,6 +43,9 @@ public class P215KthLargestElementInAnArray {
             // We need a starting point in order to partition the array
             // "pivot" is the candidate index & value that we begin with
             // By selecting the last element, it makes the process easier
+            int randomIndex = beg + (int) (Math.random() * (end - beg + 1));
+            swap(nums, randomIndex, end);
+
             final int pivotValue = nums[end];
 
             // All values > pivotValue should be put to the left of partitionIndex
@@ -65,8 +64,8 @@ public class P215KthLargestElementInAnArray {
                 return;
             }
 
-            quickSort(nums, beg, partitionIndex - 1, targetIndex);
-            quickSort(nums, partitionIndex + 1, end, targetIndex);
+            quickSelect(nums, beg, partitionIndex - 1, targetIndex);
+            quickSelect(nums, partitionIndex + 1, end, targetIndex);
         }
 
         private void swap(int[] nums, int i, int j) {
