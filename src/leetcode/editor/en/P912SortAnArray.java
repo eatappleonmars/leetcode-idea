@@ -40,39 +40,22 @@ public class P912SortAnArray {
             if (lt >= rt) {
                 return;
             }
-            int pivotIndex = quickSortPartition(nums, lt, rt);
-            quickSort(nums, lt, pivotIndex - 1);
-            quickSort(nums, pivotIndex + 1, rt);
-        }
 
-        /**
-         * Randomly select a pivot value, and partition the nums array such that
-         *   values <= pivot value are put on the left  side of the pivot value, and
-         *   values >  pivot value are put on the right side of the pivot value
-         * Return the pivot index
-         */
-        private int quickSortPartition(int[] nums, int lt, int rt) {
-            // To avoid worst case scenario which has O(n^2)
-            int randomIndex = lt + (int) (Math.random() * (rt - lt + 1));
-            // Swap pivot value with leftmost value
-            swap(nums, lt, randomIndex);
-            // nums[candidateIndex] is the first value > pivotValue, and hence could be
-            // used to swap for later values <= pivotValues
-            int candidateIndex = lt + 1;
-            // Clever method below::
-            // Leave pivot (namely, nums[lt]) where it is for the moment to avoid unnecessary swaps or
-            // the need to determine if looking left or right
-            int pivotValue = nums[lt];
-            for (int i = lt + 1; i <= rt; i++) {
+            int pivotIndex = lt + (int) (Math.random() * (rt - lt + 1));
+            swap(nums, pivotIndex, rt);
+
+            int pivotValue = nums[rt];
+            int partitionIndex = lt;
+            for (int i = lt; i < rt; i++) {
                 if (nums[i] <= pivotValue) {
-                    swap(nums, i, candidateIndex);
-                    candidateIndex++;
+                    swap(nums, i, partitionIndex);
+                    partitionIndex++;
                 }
             }
-            // Now swap pivot to the proper place to the last valid index at which the value <= pivotValue
-            swap(nums, lt, candidateIndex - 1);
+            swap(nums, partitionIndex, rt);
 
-            return candidateIndex - 1;
+            quickSort(nums, lt, partitionIndex - 1);
+            quickSort(nums, partitionIndex + 1, rt);
         }
 
         private void swap(int[] nums, int i, int j) {
