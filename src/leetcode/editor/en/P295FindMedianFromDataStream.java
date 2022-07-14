@@ -111,13 +111,4 @@ public class P295FindMedianFromDataStream {
      * double param_2 = obj.findMedian();
      */
     //leetcode submit region end(Prohibit modification and deletion)
-
-    
-    /**
-     * Test
-     */
-    public static void main(String[] args) {
-        Solution sol = new P295FindMedianFromDataStream().new Solution();
-        
-    } 
 }
