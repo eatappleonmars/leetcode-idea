@@ -80,6 +80,7 @@ public class P1404NumberOfStepsToReduceANumberInBinaryRepresentationToOne {
                 char[] array = s.toCharArray();
                 int count = 0;
                 int carry = 0;
+                // array[i] must be '1'
                 for (int i = array.length - 1; i > 0; i--) {
                     if (array[i] - '0' != carry) {
                         carry = 1;
