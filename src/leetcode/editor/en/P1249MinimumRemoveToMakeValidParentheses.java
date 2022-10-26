@@ -58,6 +58,7 @@ package leetcode.editor.en;
 
 // 2021-11-15 09:37:49
 
+import java.util.Deque;
 import java.util.LinkedList;
 
 public class P1249MinimumRemoveToMakeValidParentheses {
@@ -71,43 +72,47 @@ public class P1249MinimumRemoveToMakeValidParentheses {
 
         public String minRemoveToMakeValid(String s) {
 
-            final LinkedList<Integer> stack = new LinkedList<>();
-            final char[] chars = s.toCharArray();
+            final LinkedList<Integer> leftBracketStack = new LinkedList<>();
+            final char[] charArray = s.toCharArray();
 
-            for (int i = 0; i < chars.length; i++) {
-                final char c = chars[i];
+            firstPassToIdentify(charArray, leftBracketStack);
+            return secondPassToBuildString(charArray, leftBracketStack);
+        }
+
+        private void firstPassToIdentify(char[] charArray, Deque<Integer> leftBracketStack) {
+            for (int i = 0; i < charArray.length; i++) {
+                char c = charArray[i];
                 if (c == LT_PARENTHESES) {
-                    stack.offerFirst(i);
+                    leftBracketStack.offerFirst(i);
                 } else if (c == RT_PARENTHESES) {
-                    if (stack.isEmpty()) {
-                        chars[i] = WILDCARD;
+                    if (leftBracketStack.isEmpty()) {
+                        charArray[i] = WILDCARD;
                     } else {
-                        stack.pollFirst();
+                        leftBracketStack.pollFirst();
                     }
                 }
             }
-
-            return updateString(chars, stack);
         }
 
-        private String updateString(final char[] chars, final LinkedList<Integer> stack) {
-            while (!stack.isEmpty()) {
-                int rmIndex = stack.pollFirst();
-                chars[rmIndex] = WILDCARD;
+        private String secondPassToBuildString(char[] charArray, Deque<Integer> leftBracketStack) {
+            // Mark invalid left brackets
+            while (!leftBracketStack.isEmpty()) {
+                int rmIndex = leftBracketStack.pollFirst();
+                charArray[rmIndex] = WILDCARD;
             }
 
             int rIndex = 0;
             int wIndex = 0;
 
-            while (rIndex < chars.length) {
-                if (chars[rIndex] != WILDCARD) {
-                    chars[wIndex] = chars[rIndex];
+            while (rIndex < charArray.length) {
+                if (charArray[rIndex] != WILDCARD) {
+                    charArray[wIndex] = charArray[rIndex];
                     wIndex++;
                 }
                 rIndex++;
             }
 
-            return new String(chars, 0, wIndex);
+            return new String(charArray, 0, wIndex);
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
