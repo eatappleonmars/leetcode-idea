@@ -101,13 +101,4 @@ public class P1570DotProductOfTwoSparseVectors {
     // SparseVector v2 = new SparseVector(nums2);
     // int ans = v1.dotProduct(v2);
     //leetcode submit region end(Prohibit modification and deletion)
-
-    
-    /**
-     * Test
-     */
-    public static void main(String[] args) {
-        Solution sol = new P1570DotProductOfTwoSparseVectors().new Solution();
-        
-    } 
 }
