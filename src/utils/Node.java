@@ -5,6 +5,7 @@ public class Node {
     public Node left;
     public Node right;
     public Node parent;
+    public Node next;
 
     public Node() {}
 
@@ -16,5 +17,10 @@ public class Node {
         val = _val;
         left = _left;
         right = _right;
+    }
+
+    public Node(int _val, Node _next) {
+        val = _val;
+        next = _next;
     }
 };
