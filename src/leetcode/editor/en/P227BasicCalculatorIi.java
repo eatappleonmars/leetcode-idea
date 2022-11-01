@@ -39,6 +39,7 @@ package leetcode.editor.en;
 
 // 2022-05-10 10:07:50
 
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -47,41 +48,44 @@ public class P227BasicCalculatorIi {
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int calculate(String s) {
-            char[] sChars = s.toCharArray();
-            int length = 0;
-            // Remove all white space characters
-            for (char c : sChars) {
-                if (c != ' ') {
-                    sChars[length] = c;
-                    length++;
+            char[] sChars = new char[s.length() + 1];
+            int len = 0;
+            for (int i = 0; i < s.length(); i++) {
+                if (s.charAt(i) != ' ') {
+                    sChars[len] = s.charAt(i);
+                    len++;
                 }
             }
-            return iterativeCalculation(sChars, length);
-        }
+            // Help with trailing number and boundary check because
+            // computation is triggered when seeing the operator.
+            sChars[len] = '+';
+            len++;
 
-        private int iterativeCalculation(char[] sChars, int length) {
 
-            Deque<Integer> operandStack = new LinkedList<>();
             char prevOperator = '+';
+            Deque<Integer> operandStack = new ArrayDeque<>();
+            operandStack.offerFirst(0);
 
-            for (int i = 0; i < length;) {
+            int parsedNum = 0;
+            for (int i = 0; i < len; i++) {
                 char c = sChars[i];
-                if (c == '+' || c == '-' || c == '*' || c == '/') {
-                    prevOperator = c;
-                    i++;
+                if (Character.isDigit(c)) {
+                    parsedNum = parsedNum * 10 + (c - '0');
                 } else {
-                    int operand = 0;
-                    while (i < length && Character.isDigit(sChars[i])) {
-                        operand = operand * 10 + sChars[i] - '0';
-                        i++;
-                    }
-                    if (prevOperator == '*' || prevOperator == '/') {
+                    if (prevOperator == '+') {
+                        operandStack.offerFirst(parsedNum);
+                    } else if (prevOperator == '-') {
+                        operandStack.offerFirst(-parsedNum);
+                    } else if (prevOperator == '*') {
                         int prevOperand = operandStack.pollFirst();
-                        operand = prevOperator == '*' ? prevOperand * operand : prevOperand / operand;
+                        operandStack.offerFirst(prevOperand * parsedNum);
                     } else {
-                        operand = prevOperator == '+'? operand : -operand;
+                        int prevOperand = operandStack.pollFirst();
+                        operandStack.offerFirst(prevOperand / parsedNum);
                     }
-                    operandStack.offerFirst(operand);
+                    // reset
+                    parsedNum = 0;
+                    prevOperator = c;
                 }
             }
 
