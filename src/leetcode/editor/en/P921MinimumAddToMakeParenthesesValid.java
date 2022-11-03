@@ -60,6 +60,8 @@ package leetcode.editor.en;
 
 // 2021-11-22 21:45:02
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.LinkedList;
 
 public class P921MinimumAddToMakeParenthesesValid {
@@ -67,6 +69,11 @@ public class P921MinimumAddToMakeParenthesesValid {
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int minAddToMakeValid(String s) {
+            return solveWithCounting(s);
+//            return solveWithStack(s);
+        }
+
+        private int solveWithCounting(String s) {
             int ltpCount = 0;
             int rtpCount = 0;
 
@@ -81,6 +88,19 @@ public class P921MinimumAddToMakeParenthesesValid {
                 }
             }
             return ltpCount + rtpCount;
+        }
+
+        private int solveWithStack(String s) {
+            Deque<Character> stack = new ArrayDeque<>();
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+                if (c == ')' && !stack.isEmpty() && stack.peekFirst() == '(') {
+                    stack.pollFirst();
+                } else {
+                    stack.offerFirst(c);
+                }
+            }
+            return stack.size();
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
