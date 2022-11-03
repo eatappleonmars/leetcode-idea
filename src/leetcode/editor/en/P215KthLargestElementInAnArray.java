@@ -35,37 +35,35 @@ public class P215KthLargestElementInAnArray {
             return nums[k - 1];
         }
 
+        // Search in range [beg, end]
         private void quickSelect(int[] nums, int beg, int end, final int targetIndex) {
-            if (beg >= end || beg > targetIndex || end < targetIndex) {
-                return;
-            }
-
-            // We need a starting point in order to partition the array
-            // "pivot" is the candidate index & value that we begin with
-            // By selecting the last element, it makes the process easier
+            // We need a starting point in order to partition the array.
+            // "pivot" is the candidate index & value that we begin with.
+            // By swapping pivot with the last element, the process becomes easier.
             int randomIndex = beg + (int) (Math.random() * (end - beg + 1));
             swap(nums, randomIndex, end);
-
             final int pivotValue = nums[end];
 
-            // All values > pivotValue should be put to the left of partitionIndex
+            // All values >= pivotValue should be put to the left of partitionIndex
             // All values < pivotValue should be put to the right of partitionIndex
-            // When partition is completed, partitionIndex should point to the pivotValue
             int partitionIndex = beg;
             for(int i = beg; i < end; i++) {
-                if (pivotValue < nums[i]) {
+                if (nums[i] >= pivotValue) {
                     swap(nums, partitionIndex, i);
                     partitionIndex++;
                 }
             }
+            // When partition is completed, partitionIndex should point to the pivotValue
             swap(nums, end, partitionIndex);
 
             if (partitionIndex == targetIndex) {
                 return;
             }
-
-            quickSelect(nums, beg, partitionIndex - 1, targetIndex);
-            quickSelect(nums, partitionIndex + 1, end, targetIndex);
+            if (partitionIndex > targetIndex) { // search left
+                quickSelect(nums, beg, partitionIndex - 1, targetIndex);
+            } else { // search right
+                quickSelect(nums, partitionIndex + 1, end, targetIndex);
+            }
         }
 
         private void swap(int[] nums, int i, int j) {
