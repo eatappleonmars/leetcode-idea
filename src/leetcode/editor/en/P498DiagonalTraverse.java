@@ -39,7 +39,7 @@ public class P498DiagonalTraverse {
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
 
-        private static final int[][] INCR = {
+        private final int[][] INCR = {
                 {-1, 1}, {1, -1}
         };
 
