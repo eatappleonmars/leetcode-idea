@@ -43,50 +43,36 @@ public class P340LongestSubstringWithAtMostKDistinctCharacters {
             if (k == 0) {
                 return 0;
             }
-
-            int maxLen = 1;
-
-            final char[] sChars = s.toCharArray();
-            final int len = sChars.length;
+            int res = 1;
             // Sliding window boundaries [lt, rt)
             int lt = 0;
-            int rt = 0;
             // Count of distinct letters within the sliding window
             int distinct = 0;
             // Count of letters in within the sliding window
-            Map<Character, Integer> charCounts = new HashMap<>();
-            while (true) {
-                // It is IMPORTANT to keep in mind that rt should remain exclusive at this point
-                // Move window's' right boundary until distinct > k
-                while (rt < len) {
-                    char c = sChars[rt];
-                    int charCount = charCounts.getOrDefault(c, 0);
-                    if (distinct < k || (distinct == k && charCount > 0)) {
-                        charCounts.put(c, charCount + 1);
-                        distinct += charCount == 0 ? 1 : 0;
-                        rt++;
-                    } else {
-                        break;
-                    }
+            int[] counts = new int[256];
+
+            // Expand sliding window's right boundary by 1 in each iteration
+            for (int rt = 0; rt < s.length(); rt++) {
+                char c = s.charAt(rt);
+                counts[c]++;
+                // Increment distinct count if this is a new char within the window
+                if (counts[c] == 1) {
+                    distinct++;
                 }
-                // Process the current length
-                maxLen = Math.max(maxLen, rt - lt);
-                // Done if reaching the end of the string
-                if (rt == len) {
-                    break;
-                }
-                // Otherwise, shrink the sliding window's left boundary until distinct == k
-                while (distinct >= k) {
-                    char c = sChars[lt];
-                    int charCount = charCounts.get(c);
-                    charCounts.put(c, charCount - 1);
-                    if (charCount == 1) {
+                // Shrink sliding window from the left boundary if there are too many distinct chars
+                while (distinct > k) {
+                    char ltChar = s.charAt(lt);
+                    counts[ltChar]--;
+                    if (counts[ltChar] == 0) {
                         distinct--;
                     }
                     lt++;
                 }
+
+                res = Math.max(res, rt - lt + 1);
             }
-            return maxLen;
+
+            return res;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
