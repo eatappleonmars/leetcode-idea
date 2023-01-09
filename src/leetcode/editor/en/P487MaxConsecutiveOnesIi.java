@@ -12,19 +12,13 @@ public class P487MaxConsecutiveOnesIi {
         public int findMaxConsecutiveOnes(int[] nums) {
             int res = 0;
 
-            int flip = 1;
             int prevZeroIndex = -1;
 
             int lt = 0;
             for (int rt = 0; rt < nums.length; rt++) {
                 if (nums[rt] == 0) {
-                    if (flip == 1) {
-                        prevZeroIndex = rt;
-                        flip = 0;
-                    } else {
-                        lt = prevZeroIndex + 1;
-                        prevZeroIndex = rt;
-                    }
+                    lt = prevZeroIndex + 1;
+                    prevZeroIndex = rt;
                 }
                 res = Math.max(res, rt - lt + 1);
             }
