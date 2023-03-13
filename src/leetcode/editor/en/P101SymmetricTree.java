@@ -59,7 +59,15 @@ public class P101SymmetricTree {
         }
 
         private boolean isSymmetric(TreeNode lt, TreeNode rt) {
-            return (lt == rt) || (lt != null && rt != null && lt.val == rt.val && isSymmetric(lt.left, rt.right) && isSymmetric(lt.right, rt.left));
+            if (lt == rt) {
+                return true;
+            }
+            if (lt == null || rt == null) {
+                return false;
+            }
+            return lt.val == rt.val &&
+                    isSymmetric(lt.left, rt.right) &&
+                    isSymmetric(lt.right, rt.left);
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
@@ -70,6 +78,5 @@ public class P101SymmetricTree {
      */
     public static void main(String[] args) {
         Solution sol = new P101SymmetricTree().new Solution();
-        
     } 
 }
