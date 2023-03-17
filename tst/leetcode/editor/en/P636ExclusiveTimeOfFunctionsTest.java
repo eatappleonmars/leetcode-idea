@@ -20,10 +20,4 @@ class P636ExclusiveTimeOfFunctionsTest {
         int[] expected = {3, 4};
         assertArrayEquals(expected, result);
     }
-
-    private void printResult(int[] result) {
-        for (int n : result) {
-            System.out.println(n);
-        }
-    }
 }

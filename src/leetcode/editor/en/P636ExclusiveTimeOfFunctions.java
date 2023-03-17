@@ -115,6 +115,7 @@ package leetcode.editor.en;
 // 2021-11-22 22:12:45
 
 
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -123,40 +124,56 @@ public class P636ExclusiveTimeOfFunctions {
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int[] exclusiveTime(int n, List<String> logs) {
-
-            int[] result = new int[n];
-            LinkedList<Integer> stack = new LinkedList<>();
-
-            int prevEndTimeStamp = -1;
-            for (String logString : logs) {
-                // parse log string
-                String[] logData = logString.split(":");
-                int id = Integer.parseInt(logData[0]);
-                char state = logData[1].charAt(0);
-                int timestamp = Integer.parseInt(logData[2]);
-                
-                // push to call stack if empty
-                if (stack.isEmpty()) {
-                    stack.offerFirst(id);
-                    continue;
-                }
-                
-                // first one in stack is the running function call
-                int runningId = stack.peekFirst();
-
-                int incr = 0;
-                if (state == 'e') {
-                    incr = timestamp - prevEndTimeStamp;
-                    stack.pollFirst(); // remove from stack
-                    prevEndTimeStamp = timestamp;
-                } else {
-                    incr = timestamp - prevEndTimeStamp - 1;
-                    stack.offerFirst(id); // push new func call to stack, current running func call is suspended
-                    prevEndTimeStamp = timestamp - 1;
-                }
-                result[runningId] += incr;
+            int[] res = new int[n];
+            Deque<CustomFunction> callStack = new LinkedList<>();
+            for (String log: logs) {
+                parseLog(log, callStack, res);
             }
-            return result;
+            return res;
+        }
+
+        class CustomFunction {
+            int id;
+            int startTimestamp;
+
+            CustomFunction(int id, int timestamp) {
+                this.id = id;
+                this.startTimestamp = timestamp;
+            }
+        }
+
+        private void parseLog(String log, Deque<CustomFunction> callStack, int[] res) {
+            String[] logElements = log.split(":");
+            int id = Integer.parseInt(logElements[0]);
+            String operation = logElements[1];
+            int timestamp = Integer.parseInt(logElements[2]);
+
+            if (operation.startsWith("s")) {
+                startNewFunction(id, timestamp, callStack, res);
+            } else {
+                terminateFunction(timestamp, callStack, res);
+            }
+        }
+
+        private void startNewFunction(int id, int startTimestamp, Deque<CustomFunction> callStack, int[] res) {
+            if (!callStack.isEmpty()) {
+                suspendFunction(startTimestamp-1, callStack, res);
+            }
+            callStack.offerFirst(new CustomFunction(id, startTimestamp));
+        }
+
+        private void terminateFunction(int endTimestamp, Deque<CustomFunction> callStack, int[] res) {
+            CustomFunction currRunning = callStack.pollFirst();
+            res[currRunning.id] += endTimestamp - currRunning.startTimestamp + 1;
+            if (!callStack.isEmpty()) {
+                CustomFunction nextRunning = callStack.peekFirst();
+                nextRunning.startTimestamp = endTimestamp + 1;
+            }
+        }
+
+        private void suspendFunction(int endTimestamp, Deque<CustomFunction> callStack, int[] res) {
+            CustomFunction currRunning = callStack.peekFirst();
+            res[currRunning.id] += endTimestamp - currRunning.startTimestamp + 1;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
