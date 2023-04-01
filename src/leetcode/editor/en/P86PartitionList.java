@@ -51,28 +51,24 @@ public class P86PartitionList {
      */
     class Solution {
         public ListNode partition(ListNode head, int x) {
-            ListNode h1 = new ListNode(), p1 = h1;
-            ListNode h2 = new ListNode(), p2 = h2;
-
+            final ListNode p1Head = new ListNode();
+            final ListNode p2Head = new ListNode();
+            ListNode p1Tail = p1Head;
+            ListNode p2Tail = p2Head;
             while (head != null) {
-                ListNode curr = head;
-                head = head.next;
-
-                if (curr.val < x) {
-                    p1.next = curr;
-                    p1 = curr;
+                if (head.val < x) {
+                    p1Tail.next = head;
+                    p1Tail = p1Tail.next;
                 } else {
-                    p2.next = curr;
-                    p2 = curr;
+                    p2Tail.next = head;
+                    p2Tail = p2Tail.next;
                 }
+                head = head.next;
             }
-
-            p2.next = null;
-            p1.next = h2.next;
-            return h1.next;
+            p1Tail.next = p2Head.next;
+            p2Tail.next = null;
+            return p1Head.next;
         }
-
-
     }
     //leetcode submit region end(Prohibit modification and deletion)
 
