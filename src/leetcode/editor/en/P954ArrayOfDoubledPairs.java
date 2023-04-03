@@ -48,60 +48,45 @@ package leetcode.editor.en;
 
 // 2021-12-06 09:32:48
 
-import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Queue;
+import java.util.HashMap;
+import java.util.Map;
 
 public class P954ArrayOfDoubledPairs {
 
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public boolean canReorderDoubled(int[] arr) {
+            // Sort the array
             Arrays.sort(arr);
-            Queue<Integer> queue = new ArrayDeque<>();
-
-            int ltIndex = 0;
-            while (ltIndex < arr.length && arr[ltIndex] < 0) {
-                if (!check(-arr[ltIndex], queue)) {
+            // Build the counting map
+            Map<Integer, Integer> countMap = new HashMap<>();
+            for (int n : arr) {
+                countMap.put(n, countMap.getOrDefault(n, 0) + 1);
+            }
+            // Start from the smallest number which may be negative, example: [-4,-2]
+            for (int i = 0; i < arr.length; i++) {
+                int n1 = arr[i];
+                int count1 = countMap.get(n1);
+                if (count1 == 0) { // This indicates the number has been used for pairing
+                    continue;
+                }
+                if (n1 < 0 && n1 % 2 != 0) { // example: cannot pair with -3 because -1.5 does not exist
                     return false;
                 }
-                ltIndex++;
-            }
-
-            // Done with negative numbers
-            if (!queue.isEmpty()) {
-                return false;
-            }
-
-            // check positive numbers from right
-            int rtIndex = arr.length - 1;
-            while (rtIndex >= ltIndex) {
-                if (!check(arr[rtIndex], queue)) {
+                int n2 = n1 < 0 ? n1 / 2 : n1 * 2;
+                int count2 = countMap.getOrDefault(n2, 0);
+                if (count2 == 0) { // no match
                     return false;
                 }
-                rtIndex--;
-            }
-
-            return queue.isEmpty();
-        }
-
-        // val >= 0
-        // first element in queue is the unmatched largest value
-        private boolean check(int val, Queue<Integer> queue) {
-            int val2 = val << 1;
-            if (queue.isEmpty() || val2 > queue.peek()) {
-                queue.offer(val);
-            } else if (val2 == queue.peek()) {
-                queue.poll();
-            } else { // This indicates the largest value can no longer be matched, fast fail
-                return false;
+                countMap.put(n1, count1 - 1);
+                countMap.put(n2, count2 - 1);
             }
             return true;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
 
-    
     /**
      * Test
      */
