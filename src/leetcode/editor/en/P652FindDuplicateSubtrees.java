@@ -104,11 +104,11 @@ public class P652FindDuplicateSubtrees {
 //            }
             int id = serialToId.computeIfAbsent(curr, key -> serialToId.size() + 1); // id = 0 has been reserved for null
 
-            int updatedCount = idToCount.getOrDefault(id, 0) + 1;
-            idToCount.put(id, updatedCount);
-            if (updatedCount == 2) {
+            int currCount = idToCount.getOrDefault(id, 0);
+            if (currCount == 1) {
                 res.add(root);
             }
+            idToCount.put(id, currCount + 1);
 
             return id;
         }
