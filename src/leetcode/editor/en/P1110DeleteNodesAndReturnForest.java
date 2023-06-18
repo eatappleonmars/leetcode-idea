@@ -69,20 +69,29 @@ public class P1110DeleteNodesAndReturnForest {
         public List<TreeNode> delNodes(TreeNode root, int[] to_delete) {
             List<TreeNode> res = new ArrayList<>();
             Set<Integer> toDelete = Arrays.stream(to_delete).boxed().collect(Collectors.toSet());
-            TreeNode node = delNodes(root, toDelete, res);
-            if (node != null) {
-                res.add(root);
-            }
+
+//            TreeNode node = sol1(root, toDelete, res);
+//            if (node != null) {
+//                res.add(root);
+//            }
+
+//            sol2(root, null, toDelete, res);
+            sol3(root, null, toDelete, res);
             return res;
         }
 
-        private TreeNode delNodes(TreeNode root, Set<Integer> toDelete, List<TreeNode> res) {
+        /**
+         * In solution#1, we decide if the current root node should be added to result
+         * while processing its parent node, which is equivalent to we decide if adding
+         * the LEFT or RIGHT child nodes to result while processing the current root node.
+         */
+        private TreeNode sol1(TreeNode root, Set<Integer> toDelete, List<TreeNode> res) {
             if (root == null) {
                 return null;
             }
 
-            root.left = delNodes(root.left, toDelete, res);
-            root.right = delNodes(root.right, toDelete, res);
+            root.left = sol1(root.left, toDelete, res);
+            root.right = sol1(root.right, toDelete, res);
 
             if (toDelete.contains(root.val)) {
                 if (root.left != null) res.add(root.left);
@@ -91,6 +100,28 @@ public class P1110DeleteNodesAndReturnForest {
             }
 
             return root;
+        }
+
+        /**
+         * In solution#2, we decide if the current root node should be added to result
+         * while processing the root node itself
+         */
+        private TreeNode sol2(TreeNode root, TreeNode parent, Set<Integer> toDelete, List<TreeNode> res) {
+            if (root == null) {
+                return null;
+            }
+            if (toDelete.contains(root.val)) {
+                root.left = sol2(root.left, null, toDelete, res);
+                root.right = sol2(root.right, null, toDelete, res);
+                return null;
+            } else { // root node will not be deleted
+                if (parent == null) {
+                    res.add(root);
+                }
+                root.left = sol2(root.left, root, toDelete, res);
+                root.right = sol2(root.right, root, toDelete, res);
+                return root;
+            }
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
