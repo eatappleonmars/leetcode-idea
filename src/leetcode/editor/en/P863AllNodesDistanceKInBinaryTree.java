@@ -67,7 +67,7 @@ public class P863AllNodesDistanceKInBinaryTree {
             // 1. [implemented below] Create path from root to target
             // 2. Create map { node : parent } of entire tree
 
-            Deque<TreeNode> pathToTarget = new ArrayDeque<>();`
+            Deque<TreeNode> pathToTarget = new ArrayDeque<>();
             buildPathToTarget(root, target, pathToTarget);
 
             List<Integer> res = new ArrayList<>();
