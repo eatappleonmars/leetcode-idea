@@ -40,25 +40,22 @@ public class P255VerifyPreorderSequenceInBinarySearchTree {
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public boolean verifyPreorder(int[] preorder) {
-            return verifyPreorder(preorder, new int[]{0}, 1, 10000);
+            int endIndex = helper(0, preorder, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            return endIndex == preorder.length;
         }
 
-        // Valid range: [min, max]
-        private boolean verifyPreorder(int[] preorder, int[] index, int min, int max) {
-            if (index[0] == preorder.length) {
-                return true;
+        // Return the next index which will be processed by the following executions (in other words, not processed yet)
+        private int helper(int index, int[] preorder, int min, int max) {
+            if (index == preorder.length) {
+                return index;
             }
-            // Verify current value as root value. Increment index if valid.
-            int val = preorder[index[0]];
-            if (val < min || val > max) {
-                return false;
+            if (preorder[index] < min || preorder[index] > max) {
+                return index;
             }
-            index[0]++;
-
-            boolean lt = verifyPreorder(preorder, index, min, val - 1);
-            boolean rt = verifyPreorder(preorder, index, val + 1, max);
-
-            return lt || rt;
+            int validRootValue = preorder[index];
+            int ltEndIndex = helper(index+1, preorder, min, validRootValue);
+            int rtEndIndex = helper(ltEndIndex, preorder, validRootValue, max);
+            return rtEndIndex;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
