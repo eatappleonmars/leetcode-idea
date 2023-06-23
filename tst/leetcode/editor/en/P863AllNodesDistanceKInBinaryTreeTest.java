@@ -31,4 +31,14 @@ class P863AllNodesDistanceKInBinaryTreeTest {
         final List<Integer> expected = List.of();
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void test3() {
+        final TreeNode root = new TreeNode(new Integer[]{0,1,null,3,2});
+        final TreeNode target = new TreeNode(2);
+        final int k = 1;
+        final List<Integer> actual = sol.distanceK(root, target, k);
+        final List<Integer> expected = List.of(1);
+        assertEquals(expected, actual);
+    }
 }

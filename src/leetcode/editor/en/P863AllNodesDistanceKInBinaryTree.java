@@ -64,57 +64,78 @@ public class P863AllNodesDistanceKInBinaryTree {
             // 1. location of the target node
             // 2. given a node, how to trace back to its parent node
             // Two options in general:
-            // 1. Create path from root to target [implemented below]
+            // 1. [implemented below] Create path from root to target
             // 2. Create map { node : parent } of entire tree
-            Deque<TreeNode> rootToTargetStack = new ArrayDeque<>();
-            buildPathFromRootToTarget(rootToTargetStack, root, target);
+
+            Deque<TreeNode> pathToTarget = new ArrayDeque<>();`
+            buildPathToTarget(root, target, pathToTarget);
 
             List<Integer> res = new ArrayList<>();
-            int distance = 0;
-            TreeNode prevNode = null;
-
-            while (!rootToTargetStack.isEmpty() && distance <= k) {
-                TreeNode node = rootToTargetStack.pollLast();
-                distanceK(node, prevNode, distance, k, res);
-                prevNode = node;
-                distance++;
-            }
+            searchDistanceK(pathToTarget, k, res);
             return res;
         }
 
-        private boolean buildPathFromRootToTarget(Deque<TreeNode> rootToTargetStack, TreeNode node, TreeNode target) {
+        /**
+         * Build the ancestor path from the root to the target node
+         * Q: How to determine that a node is the ancestor of the target node?
+         * A: One of its children is the ancestor of the target node, or is the target node itself.
+         */
+        private boolean buildPathToTarget(TreeNode node, TreeNode target, Deque<TreeNode> pathToTarget) {
             if (node == null) {
                 return false;
             }
-
-            rootToTargetStack.offerLast(node);
-
-            if (node.val == target.val) {
+            if (node.val == target.val || (buildPathToTarget(node.left, target, pathToTarget)
+                    || buildPathToTarget(node.right, target, pathToTarget))) {
+                pathToTarget.offerFirst(node);
                 return true;
             }
-            boolean found = buildPathFromRootToTarget(rootToTargetStack, node.left, target) || buildPathFromRootToTarget(rootToTargetStack, node.right, target);
-
-            if (!found) { // remote node from path
-                rootToTargetStack.pollLast();
-            }
-            return found;
+            return false;
         }
 
-        private void distanceK(TreeNode currNode, TreeNode prevNode,int distance, int k, List<Integer> res) {
-            if (currNode == null) {
+        private void searchDistanceK(Deque<TreeNode> pathToTarget, int k, List<Integer> res) {
+            // Drop ancestor nodes that more than distance-k
+            while (pathToTarget.size() > k + 1) {
+                pathToTarget.pollFirst();
+            }
+
+            // Corner case: first node on path is distance-k away from target
+            if (pathToTarget.size() == k + 1) {
+                TreeNode node = pathToTarget.pollFirst();
+                res.add(node.val);
+            }
+
+            // General case: ignore the node on the path but search one of its children (in that
+            // one child must be on the path which should be ignored)
+            int distance = pathToTarget.size() - 1;
+            while (!pathToTarget.isEmpty()) {
+                TreeNode node = pathToTarget.pollFirst();
+
+                if (pathToTarget.isEmpty() || node.left != pathToTarget.peekFirst()) {
+                    search(node.left, distance+1, k, res);
+                }
+                if (pathToTarget.isEmpty() || node.right != pathToTarget.peekFirst()) {
+                    search(node.right, distance+1, k, res);
+                }
+                distance--;
+            }
+        }
+
+        /**
+         * Given a node and its distance to the target node, check if the distance is k.
+         * If true, then stop at current node, and add its value to the result.
+         * If false, then check both of its children nodes.
+         */
+
+        private void search(TreeNode node, int distance, int k, List<Integer> res) {
+            if (node == null) {
                 return;
             }
             if (distance == k) {
-                res.add(currNode.val);
+                res.add(node.val);
                 return;
             }
-            
-            if (currNode.left != prevNode) {
-                distanceK(currNode.left, currNode, distance + 1, k, res);    
-            }
-            if (currNode.right != prevNode) {
-                distanceK(currNode.right, currNode, distance + 1, k, res);    
-            }
+            search(node.left, distance+1, k, res);
+            search(node.right, distance+1, k, res);
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
@@ -124,7 +145,6 @@ public class P863AllNodesDistanceKInBinaryTree {
      * Test
      */
     public static void main(String[] args) {
-        Solution sol = new P863AllNodesDistanceKInBinaryTree().new Solution();
         
     } 
 }
