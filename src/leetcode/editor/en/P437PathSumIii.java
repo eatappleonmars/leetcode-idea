@@ -61,25 +61,24 @@ public class P437PathSumIii {
 class Solution {
 
     public int pathSum(TreeNode root, int targetSum) {
-        // { prefixSum : count }
-        Map<Integer, Integer> prefixSumMap = new HashMap<>();
-        prefixSumMap.put(0, 1);
-        return dfs(root, 0, targetSum, prefixSumMap);
+        Map<Long, Integer> countMap = new HashMap<>();
+        countMap.put(0L, 1);
+        return helper(root, 0, targetSum, countMap);
     }
 
-    private int dfs(TreeNode root, int prefixSum, int targetSum, Map<Integer, Integer> map) {
-        if (root == null) {
+    private int helper(TreeNode node, long prefixSum, int target, Map<Long, Integer> countMap) {
+        if (node == null) {
             return 0;
         }
-        prefixSum += root.val;
 
-        int count = map.getOrDefault(prefixSum - targetSum, 0);
-        map.put(prefixSum, map.getOrDefault(prefixSum, 0) + 1);
+        prefixSum += node.val;
+        int count = countMap.getOrDefault(prefixSum - target, 0);
+        countMap.put(prefixSum, countMap.getOrDefault(prefixSum, 0) + 1);
 
-        count += dfs(root.left, prefixSum, targetSum, map);
-        count += dfs(root.right, prefixSum, targetSum, map);
+        count += helper(node.left, prefixSum, target, countMap);
+        count += helper(node.right, prefixSum, target, countMap);
 
-        map.put(prefixSum, map.get(prefixSum) - 1); // backtrack
+        countMap.put(prefixSum, countMap.get(prefixSum) - 1);
 
         return count;
     }

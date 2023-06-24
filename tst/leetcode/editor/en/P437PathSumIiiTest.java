@@ -28,4 +28,19 @@ class P437PathSumIiiTest {
         final int targetSum = 0;
         assertEquals(0, sol.pathSum(root, targetSum));
     }
+
+    @Test
+    public void test4() {
+        final TreeNode root = new TreeNode(new Integer[]{0,1,1});
+        final int targetSum = 1;
+        assertEquals(4, sol.pathSum(root, targetSum));
+    }
+
+    // The prefix sum overflows if using int
+    @Test
+    public void test5() {
+        final TreeNode root = new TreeNode(new Integer[]{1000000000,1000000000,null,294967296,null,1000000000,null,1000000000,null,1000000000});
+        final int targetSum = 0;
+        assertEquals(0, sol.pathSum(root, targetSum));
+    }
 }
