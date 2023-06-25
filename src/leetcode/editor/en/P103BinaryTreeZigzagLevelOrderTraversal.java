@@ -41,7 +41,9 @@ package leetcode.editor.en;
 import com.sun.source.tree.Tree;
 import utils.TreeNode;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -77,9 +79,41 @@ public class P103BinaryTreeZigzagLevelOrderTraversal {
             if (root == null) {
                 return res;
             }
-            dfs(root, 0, res);
-//            bfs(root, res);
+//            dfs(root, 0, res);
+            bfs(root, res);
             return res;
+        }
+
+        public void bfs(TreeNode root, List<List<Integer>> res) {
+
+            Deque<TreeNode> deque = new ArrayDeque<>();
+            deque.offerFirst(root);
+
+            boolean leftToRight = true;
+
+            while (!deque.isEmpty()) {
+                int size = deque.size();
+                List<Integer> levelValues = new ArrayList<>(size);
+                if (leftToRight) {
+                    while (size > 0) {
+                        TreeNode node = deque.pollFirst();
+                        levelValues.add(node.val);
+                        if (node.left != null) deque.offerLast(node.left);
+                        if (node.right != null) deque.offerLast(node.right);
+                        size--;
+                    }
+                } else {
+                    while (size > 0) {
+                        TreeNode node = deque.pollLast();
+                        levelValues.add(node.val);
+                        if (node.right != null) deque.offerFirst(node.right);
+                        if (node.left != null) deque.offerFirst(node.left);
+                        size--;
+                    }
+                }
+                leftToRight = !leftToRight;
+                res.add(levelValues);
+            }
         }
 
         private void dfs(TreeNode root, int depth, List<List<Integer>> res) {
@@ -97,43 +131,6 @@ public class P103BinaryTreeZigzagLevelOrderTraversal {
             }
             dfs(root.left, depth + 1, res);
             dfs(root.right, depth + 1, res);
-        }
-
-        private void bfs(TreeNode root, List<List<Integer>> res) {
-            Queue<TreeNode> queue = new LinkedList<>();
-
-            boolean forwardOrder = true;
-            queue.offer(root);
-
-            while (!queue.isEmpty()) {
-                List<Integer> levelRes = new LinkedList<>();
-                int levelSize = queue.size();
-                while (levelSize > 0) {
-                    TreeNode node = queue.poll();
-                    add(node, forwardOrder, levelRes);
-                    generate(node, queue);
-                    levelSize--;
-                }
-                forwardOrder = !forwardOrder;
-                res.add(levelRes);
-            }
-        }
-
-        private void add(TreeNode node, boolean forwardOrder, List<Integer> levelRes) {
-            if (forwardOrder) {
-                levelRes.add(node.val);
-            } else {
-                levelRes.add(0, node.val);
-            }
-        }
-
-        private void generate(TreeNode node, Queue<TreeNode> queue) {
-            if (node.left != null) {
-                queue.offer(node.left);
-            }
-            if (node.right != null) {
-                queue.offer(node.right);
-            }
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
