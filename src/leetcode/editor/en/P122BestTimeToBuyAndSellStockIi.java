@@ -61,8 +61,9 @@ public class P122BestTimeToBuyAndSellStockIi {
         public int maxProfit(int[] prices) {
             int maxProfit = 0;
             for (int i = 1; i < prices.length; i++) {
-                int profit = Math.max(0, prices[i] - prices[i-1]);
-                maxProfit = Math.max(maxProfit, maxProfit + profit);
+                int prevProfit = maxProfit;
+                int currProfit =  prices[i] - prices[i-1];
+                maxProfit = Math.max(maxProfit, prevProfit + currProfit);
             }
             return maxProfit;
         }
