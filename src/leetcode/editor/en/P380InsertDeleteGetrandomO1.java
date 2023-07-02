@@ -70,10 +70,10 @@ public class P380InsertDeleteGetrandomO1 {
     //leetcode submit region begin(Prohibit modification and deletion)
     class RandomizedSet {
 
-        private int[] values = new int[200000];
+        private final int[] values = new int[200000];
         private int size = 0;
-        private Map<Integer, Integer> map = new HashMap<>();
-        private Random random = new Random();
+        private final Map<Integer, Integer> map = new HashMap<>();
+        private final Random random = new Random();
 
         public RandomizedSet() {
 
@@ -93,17 +93,14 @@ public class P380InsertDeleteGetrandomO1 {
             if (!map.containsKey(val)) {
                 return false;
             }
-            // put the last value to this spot
-
-            int lastValue = values[size - 1];
+            // Remove the value
+            int valIndex = map.remove(val);
             size--;
-
-            int targetIndex = map.remove(val);
-            values[targetIndex] = lastValue;
-            map.replace(lastValue, targetIndex);
-
-            map.remove(val);
-
+            
+            // Put the last value to this spot
+            int lastValue = values[size];
+            values[valIndex] = lastValue;
+            map.replace(lastValue, valIndex);
 
             return true;
         }
@@ -113,52 +110,6 @@ public class P380InsertDeleteGetrandomO1 {
             return values[index];
         }
     }
-//    class RandomizedSet {
-//
-//        private final Random random;
-//        private final List<Integer> numbers;
-//        private final Map<Integer, Integer> map;
-//
-//        public RandomizedSet() {
-//            this.numbers = new ArrayList<>();
-//            this.map = new HashMap<>(); // { value : index }
-//            this.random = new Random();
-//        }
-//
-//        public boolean insert(int val) {
-//            if (this.map.containsKey(val)) {
-//                return false;
-//            }
-//            this.map.put(val, this.numbers.size());
-//            this.numbers.add(val);
-//            return true;
-//        }
-//
-//        public boolean remove(int val) {
-//            if (!this.map.containsKey(val)) {
-//                return false;
-//            }
-//            if (this.numbers.size() > 1) {
-//                int index = this.map.get(val);
-//                int lastValue = this.numbers.get(this.numbers.size() - 1);
-//                // put last element to current index
-//                this.numbers.set(index, lastValue);
-//                this.map.put(lastValue, index);
-//            }
-//            this.map.remove(val);
-//            this.numbers.remove(this.numbers.size() - 1);
-//            return true;
-//        }
-//
-//        private void update(int index, int val) {
-//            this.numbers.set(index, val);
-//            this.map.put(val, index);
-//        }
-//
-//        public int getRandom() {
-//            return numbers.get(random.nextInt(numbers.size()));
-//        }
-//    }
 
     /**
      * Your RandomizedSet object will be instantiated and called as such:
