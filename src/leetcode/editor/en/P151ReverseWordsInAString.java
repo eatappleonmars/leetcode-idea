@@ -57,12 +57,25 @@ package leetcode.editor.en;
 
 // 2023-07-04 22:40:36
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class P151ReverseWordsInAString {
     
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public String reverseWords(String s) {
-            return sol1WithCustomUtils(s);
+//            return sol1WithCustomUtils(s); // faster
+            return sol2WithBuiltInUtils(s); // easier
+        }
+
+        private String sol2WithBuiltInUtils(String s) {
+            s = s.trim();
+            String[] words = s.split("\\s+");
+            List<String> wordList = Arrays.asList(words);
+            Collections.reverse(wordList);
+            return String.join(" ", wordList);
         }
 
         private String sol1WithCustomUtils(String s) {
