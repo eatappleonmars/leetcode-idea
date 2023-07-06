@@ -62,10 +62,29 @@ public class P167TwoSumIiInputArrayIsSorted {
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int[] twoSum(int[] numbers, int target) {
-            return sol1WithBinarySearch(numbers, target);
+            return sol1(numbers, target);
+//            return sol2BinarySearch(numbers, target);
         }
 
-        private int[] sol1WithBinarySearch(int[] numbers, int target) {
+        // O(n)
+        private int[] sol1(int[] numbers, int target) {
+            int i = 0, j = numbers.length - 1;
+            while (true) {
+                int sum = numbers[i] + numbers[j];
+                if (sum == target) {
+                    break;
+                }
+                if (sum < target) {
+                    i++;
+                } else {
+                    j--;
+                }
+            }
+            return new int[]{i + 1, j + 1};
+        }
+
+        // O(n*log(n))
+        private int[] sol2BinarySearch(int[] numbers, int target) {
             int j = numbers.length - 1;
             for (int i = 0; i < numbers.length; i++) {
                 int a = numbers[i];
