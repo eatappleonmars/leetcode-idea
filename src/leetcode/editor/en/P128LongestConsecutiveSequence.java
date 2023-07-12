@@ -49,7 +49,7 @@ public class P128LongestConsecutiveSequence {
             int res = 0;
             for (int n : set) {
                 if (set.contains(n - 1)) {
-                    continue;
+                    continue; // n must have been processed
                 }
                 int count = 1; // itself
                 int m = n + 1;
