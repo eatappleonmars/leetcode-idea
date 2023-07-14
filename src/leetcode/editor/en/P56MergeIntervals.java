@@ -47,6 +47,33 @@ public class P56MergeIntervals {
         public int[][] merge(int[][] intervals) {
             Arrays.sort(intervals, Comparator.comparingInt(array -> array[0]));
             List<int[]> mergedIntervals = new ArrayList<>();
+            solveWithStyle1(intervals, mergedIntervals);
+//            solveWithStyle2(intervals, 0, mergedIntervals);
+            return mergedIntervals.toArray(new int[mergedIntervals.size()][]);
+        }
+
+        private void solveWithStyle2(int[][] intervals, int lt, List<int[]> mergedIntervals) {
+            if (lt == intervals.length) {
+                return;
+            }
+            int[] a = intervals[lt];
+            int rt = lt + 1;
+            while (rt < intervals.length && a[1] >= intervals[rt][0]) { // keep merging intervals
+                a[1] = Math.max(a[1], intervals[rt][1]);
+                rt++;
+            }
+            // Two possible cases when reaching here:
+            // 1. Cannot merge
+            // 2. Reach end
+            // Either way, lt < n so need to add interval a to the result
+            mergedIntervals.add(a);
+            // Continue if not done
+            if (rt < intervals.length) {
+                solveWithStyle2(intervals, rt, mergedIntervals);
+            }
+        }
+
+        public void solveWithStyle1(int[][] intervals, List<int[]> mergedIntervals) {
 
             int[] lastMergedInterval = intervals[0];
             mergedIntervals.add(lastMergedInterval);
@@ -61,7 +88,6 @@ public class P56MergeIntervals {
                     lastMergedInterval = currentInterval;
                 }
             }
-            return mergedIntervals.toArray(new int[mergedIntervals.size()][]);
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
