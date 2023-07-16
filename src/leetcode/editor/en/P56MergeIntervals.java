@@ -46,48 +46,30 @@ public class P56MergeIntervals {
     class Solution {
         public int[][] merge(int[][] intervals) {
             Arrays.sort(intervals, Comparator.comparingInt(array -> array[0]));
-            List<int[]> mergedIntervals = new ArrayList<>();
-            solveWithStyle1(intervals, mergedIntervals);
-//            solveWithStyle2(intervals, 0, mergedIntervals);
-            return mergedIntervals.toArray(new int[mergedIntervals.size()][]);
-        }
+            int len = intervals.length;;
+            int[][] tempRes = new int[len][];
 
-        private void solveWithStyle2(int[][] intervals, int lt, List<int[]> mergedIntervals) {
-            if (lt == intervals.length) {
-                return;
-            }
-            int[] a = intervals[lt];
-            int rt = lt + 1;
-            while (rt < intervals.length && a[1] >= intervals[rt][0]) { // keep merging intervals
-                a[1] = Math.max(a[1], intervals[rt][1]);
-                rt++;
-            }
-            // Two possible cases when reaching here:
-            // 1. Cannot merge
-            // 2. Reach end
-            // Either way, lt < n so need to add interval a to the result
-            mergedIntervals.add(a);
-            // Continue if not done
-            if (rt < intervals.length) {
-                solveWithStyle2(intervals, rt, mergedIntervals);
-            }
-        }
+            tempRes[0] = intervals[0];
+            int count = 1;
 
-        public void solveWithStyle1(int[][] intervals, List<int[]> mergedIntervals) {
+            for (int i = 1; i < len; i++) {
+                int[] currInterval = intervals[i];
+                int[] prevInterval = tempRes[count - 1];
 
-            int[] lastMergedInterval = intervals[0];
-            mergedIntervals.add(lastMergedInterval);
 
-            for (int i = 1; i < intervals.length; i++) {
-                int[] currentInterval = intervals[i];
-
-                if (currentInterval[0] <= lastMergedInterval[1]) { // Overlap
-                    lastMergedInterval[1] = Math.max(lastMergedInterval[1], currentInterval[1]); // merge, and canMerge remains to be true (implicit)
+                if (currInterval[0] > prevInterval[1]) { // No overlap
+                    tempRes[count] = currInterval;
+                    count++;
                 } else { // No overlap
-                    mergedIntervals.add(currentInterval);
-                    lastMergedInterval = currentInterval;
+                    prevInterval[1] = Math.max(prevInterval[1], currInterval[1]); // merge, and canMerge remains to be true (implicit)
                 }
             }
+
+            int[][] res = new int[count][];
+            for (int i = 0; i < count; i++) {
+                res[i] = tempRes[i];
+            }
+            return res;
         }
     }
     //leetcode submit region end(Prohibit modification and deletion)
