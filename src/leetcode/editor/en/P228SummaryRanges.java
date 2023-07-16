@@ -64,11 +64,35 @@ public class P228SummaryRanges {
     class Solution {
         public List<String> summaryRanges(int[] nums) {
             List<String> res = new ArrayList<>();
-            helper(nums, 0, res);
+//            sol1WithTailRecursion(nums, res);
+            sol2WithIteration(nums, res);
             return res;
         }
 
-        private void helper(int[] nums, int lt, List<String> res) {
+        private void sol2WithIteration(int[] nums, List<String> res) {
+            int lt = 0;
+            while (lt < nums.length) {
+                int start = nums[lt];
+                int end = start;
+                int rt = lt + 1;
+                while (rt < nums.length && nums[rt] == nums[rt - 1] + 1) {
+                    end = nums[rt];
+                    rt++;
+                }
+                lt = rt;
+                // Two possible cases, reach ending boundary or not consecutive
+                if (rt == nums.length) {
+                    end = nums[nums.length - 1];
+                }
+                res.add(start == end ? String.valueOf(start) : start + "->" + end);
+            }
+        }
+
+        private void sol1WithTailRecursion(int[] nums, List<String> res) {
+            sol1Helper(nums, 0, res);
+        }
+
+        private void sol1Helper(int[] nums, int lt, List<String> res) {
             if (lt == nums.length) {
                 return;
             }
@@ -84,7 +108,7 @@ public class P228SummaryRanges {
             } else {
                 res.add(nums[lt] + "->" + nums[rt - 1]);
             }
-            helper(nums, rt, res);
+            sol1Helper(nums, rt, res);
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)
